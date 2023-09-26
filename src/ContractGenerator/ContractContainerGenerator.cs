@@ -55,7 +55,7 @@ public class ContractContainerGenerator
     /// Generates the Class for the ReferenceState as part of the aelf contract
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L514
-    private static string GenerateReferenceClass(ServiceDescriptor serviceDescriptor, uint flags)
+    private static string GenerateReferenceClass(ServiceDescriptor serviceDescriptor, byte flags)
     {
         throw new NotImplementedException();
     }
@@ -95,9 +95,7 @@ public class ContractContainerGenerator
 
     private static string GetStateTypeName(ServiceDescriptor service)
     {
-        //aelf.csharp_state is 505030 as per proto
-        var ext = new Extension<ServiceOptions, FieldCodec<string>>(505030, default);
-        return service.GetOptions().GetExtension(ext).ToString();
+        return service.GetOptions().GetExtension(AElf.OptionsExtensions.CsharpState).ToString();
     }
 
     //TODO Implementation following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L60
@@ -107,7 +105,7 @@ public class ContractContainerGenerator
     }
 
     //TODO Implementation https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
-    private static string GetAccessLevel(char flags)
+    private static string GetAccessLevel(byte flags)
     {
         throw new NotImplementedException();
     }
@@ -157,7 +155,7 @@ public class ContractContainerGenerator
     /// Generate will produce a chunk of C# code that serves as the container class of the AElf Contract.
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L612
-    public string Generate(ServiceDescriptor serviceDescriptor,uint flags)
+    public string Generate(ServiceDescriptor serviceDescriptor,byte flags)
     {
         throw new NotImplementedException();
     }

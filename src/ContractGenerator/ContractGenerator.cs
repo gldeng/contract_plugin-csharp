@@ -6,13 +6,16 @@ using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
 
-internal enum Flags : uint
+public class FlagConstants
 {
-    GENERATE_CONTRACT = 0,
-    GENERATE_STUB = 0x2, // hex for 0000 0010
-    GENERATE_REFERENCE = 0x4, // hex for 0000 0100
-    GENERATE_EVENT = 0x8, // hex for 0000 1000
-    INTERNAL_ACCESS = 0x80 // hex for 1000 0000
+    public const byte GENERATE_CONTRACT = 0x01; // hex for 0000 0001
+    public const byte GENERATE_STUB = 0x02;     // hex for 0000 0010
+    public const byte GENERATE_REFERENCE = 0x04; // hex for 0000 0100
+    public const byte GENERATE_EVENT = 0x08;    // hex for 0000 1000
+    public const byte INTERNAL_ACCESS = 0x80;   // hex for 1000 0000
+
+    public const byte GENERATE_CONTRACT_WITH_EVENT = GENERATE_CONTRACT | GENERATE_EVENT;
+    public const byte GENERATE_STUB_WITH_EVENT = GENERATE_STUB | GENERATE_EVENT;
 }
 
 //This is the main entry-point into this project and is exposed to external users
@@ -54,7 +57,7 @@ public class ContractGenerator
             //TODO Implement logic as per
             //GenerateEvent
             var cSharpEventClass = new ContractEventClassGenerator();
-            var flag = (uint)Flags.GENERATE_STUB; //TODO need to make this dynamic like in the C++
+            var flag = FlagConstants.GENERATE_STUB; //TODO need to make this dynamic like in the C++
             foreach (var descriptorMsg in fileDescriptor.MessageTypes)
             {
                 output.AppendLine(cSharpEventClass.Generate(descriptorMsg, flag));
