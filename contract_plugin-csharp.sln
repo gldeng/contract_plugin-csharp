@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContractGeneratorLibrary", "ContractGeneratorLibrary\ContractGeneratorLibrary.csproj", "{AEC22CE5-F118-414C-A962-D1BAA026FA98}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContractGenerator", "src\ContractGenerator\ContractGenerator.csproj", "{AEC22CE5-F118-414C-A962-D1BAA026FA98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContractPlugin", "ContractPlugin\ContractPlugin.csproj", "{655FE90D-C606-404F-B7B3-F3DD2C3C9452}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContractPlugin", "src\ContractPlugin\ContractPlugin.csproj", "{655FE90D-C606-404F-B7B3-F3DD2C3C9452}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

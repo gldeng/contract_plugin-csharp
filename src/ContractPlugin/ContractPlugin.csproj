@@ -14,7 +14,7 @@
     <ItemGroup>
         <PackageReference Include="Google.Protobuf" Version="3.24.3" />
         <!-- TODO This needs to be a nuget pkg eventually -->
-        <ProjectReference Include="..\ContractGeneratorLibrary\ContractGeneratorLibrary.csproj" />
+        <ProjectReference Include="..\ContractGenerator\ContractGenerator.csproj" />
     </ItemGroup>
 
     <ItemGroup>

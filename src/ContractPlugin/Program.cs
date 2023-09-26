@@ -2,7 +2,7 @@ using System.Text;
 using Google.Protobuf;
 using Google.Protobuf.Compiler;
 using Google.Protobuf.Reflection;
-using ContractGeneratorLibrary;
+using ContractGenerator;
 
 namespace ContractPluginCsharp;
 
@@ -18,7 +18,7 @@ private static void Main(string[] args)
 
         Stream stream = Console.OpenStandardInput();
 
-        ContractGenerator contractGenerator = new ContractGenerator();
+        ContractGenerator.ContractGenerator contractGenerator = new ContractGenerator.ContractGenerator();
         CodeGeneratorResponse response = contractGenerator.Generate(stream);
 
         // set result to standard output
