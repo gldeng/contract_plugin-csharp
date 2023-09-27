@@ -5,7 +5,7 @@ namespace ContractGeneratorLibrary;
 public class ProtoUtils
 {
     //TODO Implement https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L73
-    public static string GetClassName(DescriptorBase descriptor,char flags)
+    public static string GetClassName(DescriptorBase descriptor, char flags)
     {
         return ToCSharpName(descriptor.FullName, descriptor.File);
     }
@@ -14,30 +14,26 @@ public class ProtoUtils
     //     return flags & Flags.INTERNAL_ACCESS ? "internal" : "public";
     // }
 
-    private static string ToCSharpName(string name, FileDescriptor fileDescriptor){
-        string result = GetFileNamespace(fileDescriptor);
+    private static string ToCSharpName(string name, FileDescriptor fileDescriptor)
+    {
+        var result = GetFileNamespace(fileDescriptor);
         if (!string.IsNullOrEmpty(result))
         {
             result += '.';
         }
 
-        string classname;
-        if (string.IsNullOrEmpty(fileDescriptor.Package))
-        {
-            classname = name;
-        }
-        else
-        {
+        var classname = string.IsNullOrEmpty(fileDescriptor.Package)
+            ? name
+            :
             // Strip the proto package from full_name since we've replaced it with
             // the C# namespace.
-            classname = name.Substring(fileDescriptor.Package.Length + 1);
-        }
+            name[(fileDescriptor.Package.Length + 1)..];
 
         classname = classname.Replace(".", ".Types.");
 
         return "global::" + result + classname;
     }
-    
+
     /// <summary>
     /// This Util gets the PropertyName based on the proto. Copied from the C++ original https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/csharp_helpers.cc#L255C35-L255C50
     /// </summary>
@@ -60,7 +56,7 @@ public class ProtoUtils
 
         // TODO: consider introducing csharp_property_name field option
         string propertyName = UnderscoresToPascalCase(GetFieldName(descriptor));
-    
+
         // Avoid either our own type name or reserved names. Note that not all names
         // are reserved - a field called to_string, write_to etc would still cause a problem.
         // There are various ways of ending up with naming collisions, but we try to avoid obvious
@@ -70,10 +66,10 @@ public class ProtoUtils
         {
             propertyName += "_";
         }
-    
+
         return propertyName;
     }
-    
+
     // Groups are hacky:  The name of the field is just the lower-cased name
     // of the group type.  In C#, though, we would like to retain the original
     // capitalization of the type name.
@@ -89,26 +85,26 @@ public class ProtoUtils
         }
     }
 
-    
-    private string UnderscoresToPascalCase(string input) {
+
+    private string UnderscoresToPascalCase(string input)
+    {
         return UnderscoresToCamelCase(input, true);
     }
-    
-    private string UnderscoresToCamelCase(string input, bool capNextLetter) {
+
+    private string UnderscoresToCamelCase(string input, bool capNextLetter)
+    {
         return UnderscoresToCamelCase(input, capNextLetter, false);
     }
-    
+
     /// <summary>
     /// Extract the C# Namespace for the target contract based on the Proto data.
     /// </summary>
     //TODO Implementation https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L66
     public static string GetFileNamespace(FileDescriptor fileDescriptor)
     {
-        if (fileDescriptor.GetOptions().HasCsharpNamespace)
-        {
-            return fileDescriptor.GetOptions().CsharpNamespace;
-        }
-        return UnderscoresToCamelCase(fileDescriptor.Package, true, true);
+        return fileDescriptor.GetOptions().HasCsharpNamespace
+            ? fileDescriptor.GetOptions().CsharpNamespace
+            : UnderscoresToCamelCase(fileDescriptor.Package, true, true);
     }
 
     /// <summary>
@@ -116,47 +112,55 @@ public class ProtoUtils
     /// </summary>
     public static string UnderscoresToCamelCase(string input, bool capNextLetter, bool preservePeriod)
     {
-        string result = "";
-        for (int i = 0; i < input.Length; i++)
+        var result = "";
+        for (var i = 0; i < input.Length; i++)
         {
-            if ('a' <= input[i] && input[i] <= 'z')
+            switch (input[i])
             {
-                if (capNextLetter)
+                case >= 'a' and <= 'z':
                 {
-                    result += (char)(input[i] + ('A' - 'a'));
+                    if (capNextLetter)
+                    {
+                        result += (char)(input[i] + ('A' - 'a'));
+                    }
+                    else
+                    {
+                        result += input[i];
+                    }
+
+                    capNextLetter = false;
+                    break;
                 }
-                else
+                case >= 'A' and <= 'Z':
                 {
+                    if (i == 0 && !capNextLetter)
+                    {
+                        // Force first letter to lower-case unless explicitly told to
+                        // capitalize it.
+                        result += (char)(input[i] + ('a' - 'A'));
+                    }
+                    else
+                    {
+                        // Capital letters after the first are left as-is.
+                        result += input[i];
+                    }
+
+                    capNextLetter = false;
+                    break;
+                }
+                case >= '0' and <= '9':
                     result += input[i];
-                }
-                capNextLetter = false;
-            }
-            else if ('A' <= input[i] && input[i] <= 'Z')
-            {
-                if (i == 0 && !capNextLetter)
+                    capNextLetter = true;
+                    break;
+                default:
                 {
-                    // Force first letter to lower-case unless explicitly told to
-                    // capitalize it.
-                    result += (char)(input[i] + ('a' - 'A'));
-                }
-                else
-                {
-                    // Capital letters after the first are left as-is.
-                    result += input[i];
-                }
-                capNextLetter = false;
-            }
-            else if ('0' <= input[i] && input[i] <= '9')
-            {
-                result += input[i];
-                capNextLetter = true;
-            }
-            else
-            {
-                capNextLetter = true;
-                if (input[i] == '.' && preservePeriod)
-                {
-                    result += '.';
+                    capNextLetter = true;
+                    if (input[i] == '.' && preservePeriod)
+                    {
+                        result += '.';
+                    }
+
+                    break;
                 }
             }
         }
@@ -184,6 +188,7 @@ public class ProtoUtils
             // Concatenate a _ at the beginning
             result = '_' + result;
         }
+
         return result;
     }
 }
