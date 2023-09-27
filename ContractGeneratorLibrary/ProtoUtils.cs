@@ -38,9 +38,26 @@ public class ProtoUtils
         return "global::" + result + classname;
     }
     
-    //TODO Implement https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/csharp_helpers.cc#L255C35-L255C50
-    string GetPropertyName(FieldDescriptor descriptor)
+    /// <summary>
+    /// This Util gets the PropertyName based on the proto. Copied from the C++ original https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/csharp_helpers.cc#L255C35-L255C50
+    /// </summary>
+    public string GetPropertyName(FieldDescriptor descriptor)
     {
+        HashSet<string> reservedMemberNames = new HashSet<string>
+        {
+            "Types",
+            "Descriptor",
+            "Equals",
+            "ToString",
+            "GetHashCode",
+            "WriteTo",
+            "Clone",
+            "CalculateSize",
+            "MergeFrom",
+            "OnConstruction",
+            "Parser"
+        };
+
         // TODO: consider introducing csharp_property_name field option
         string propertyName = UnderscoresToPascalCase(GetFieldName(descriptor));
     
@@ -49,8 +66,7 @@ public class ProtoUtils
         // There are various ways of ending up with naming collisions, but we try to avoid obvious
         // ones.
         if (propertyName == descriptor.ContainingType.Name
-            || propertyName == "Types"
-            || propertyName == "Descriptor")
+            || reservedMemberNames.Contains(propertyName))
         {
             propertyName += "_";
         }
