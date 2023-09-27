@@ -6,5 +6,10 @@ This is the actual protoc-plugin executable that is to be built & distributed to
 ## Build
 
 ``
-make osx-build-executable
+dotnet build
+``
+
+Though to build a single platform-specific binary executable you would need to use this command:
+``
+dotnet publish -c Release -r osx.13-arm64 --self-contained true
 ``

@@ -9,7 +9,7 @@ namespace ContractGenerator;
 public class ContractGenerator
 {
     /// <summary>
-    /// Generate will return a CodeGeneratorResponse including the complete set of C# files for the Contract project. This is the primary entry-point into the ContractPlugin.
+    /// Generates a set of C# files from the input stream containing the proto source. This is the primary entry-point into the ContractPlugin.
     /// </summary>
     public CodeGeneratorResponse Generate(Stream stdin)
     {

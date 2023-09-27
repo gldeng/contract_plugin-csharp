@@ -11,7 +11,7 @@ namespace ContractPluginCsharp;
 
 internal class Program
 {
-private static void Main(string[] args)
+    private static void Main(string[] args)
     {
         // you can attach debugger
         // System.Diagnostics.Debugger.Launch();
