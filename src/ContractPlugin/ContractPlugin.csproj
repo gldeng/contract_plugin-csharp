@@ -3,7 +3,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net7.0</TargetFramework>
-        <RootNamespace>contract_plugin_csharp</RootNamespace>
+        <RootNamespace>ContractPlugin</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <PublishTrimmed>true</PublishTrimmed>
         <PublishReadyToRun>true</PublishReadyToRun>
