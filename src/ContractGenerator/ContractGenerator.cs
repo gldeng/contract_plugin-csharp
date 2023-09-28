@@ -8,14 +8,14 @@ namespace ContractGenerator;
 
 public class FlagConstants
 {
-    public const byte GENERATE_CONTRACT = 0x01; // hex for 0000 0001
-    public const byte GENERATE_STUB = 0x02;     // hex for 0000 0010
-    public const byte GENERATE_REFERENCE = 0x04; // hex for 0000 0100
-    public const byte GENERATE_EVENT = 0x08;    // hex for 0000 1000
-    public const byte INTERNAL_ACCESS = 0x80;   // hex for 1000 0000
+    public const byte GenerateContract = 0x01; // hex for 0000 0001
+    public const byte GenerateStub = 0x02;     // hex for 0000 0010
+    public const byte GenerateReference = 0x04; // hex for 0000 0100
+    public const byte GenerateEvent = 0x08;    // hex for 0000 1000
+    public const byte InternalAccess = 0x80;   // hex for 1000 0000
 
-    public const byte GENERATE_CONTRACT_WITH_EVENT = GENERATE_CONTRACT | GENERATE_EVENT;
-    public const byte GENERATE_STUB_WITH_EVENT = GENERATE_STUB | GENERATE_EVENT;
+    public const byte GenerateContractWithEvent = GenerateContract | GenerateEvent;
+    public const byte GenerateStubWithEvent = GenerateStub | GenerateEvent;
 }
 
 //This is the main entry-point into this project and is exposed to external users
@@ -57,7 +57,7 @@ public class ContractGenerator
             //TODO Implement logic as per
             //GenerateEvent
             var cSharpEventClass = new ContractEventClassGenerator();
-            var flag = FlagConstants.GENERATE_STUB; //TODO need to make this dynamic like in the C++
+            var flag = FlagConstants.GenerateStub; //TODO need to make this dynamic like in the C++
             foreach (var descriptorMsg in fileDescriptor.MessageTypes)
             {
                 output.AppendLine(cSharpEventClass.Generate(descriptorMsg, flag));
@@ -76,14 +76,14 @@ public class ContractGenerator
             //
             // generatedCSCodeBody = generatedCSCodeNodeRoot
 
-            string generatedCSCodeBody = output.ToString();
-            string outputFileName = GetServicesFilename(fileDescriptor);
+            var generatedCsCodeBody = output.ToString() ?? throw new ArgumentNullException("output.ToString()");
+            var outputFileName = GetServicesFilename(fileDescriptor);
 
             response.File.Add(
                 new CodeGeneratorResponse.Types.File
                 {
                     Name = outputFileName,
-                    Content = generatedCSCodeBody
+                    Content = generatedCsCodeBody
                 }
             );
         }
