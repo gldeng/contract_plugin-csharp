@@ -92,7 +92,7 @@ public class ProtoUtils
     /// <summary>
     /// This Util does more than just convert underscores to camel-case. copied from the C++ original https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L138
     /// </summary>
-    private static string UnderscoresToCamelCase(string input, bool capNextLetter, bool preservePeriod = false)
+    internal static string UnderscoresToCamelCase(string input, bool capNextLetter, bool preservePeriod = false)
     {
         var result = "";
         for (var i = 0; i < input.Length; i++)
