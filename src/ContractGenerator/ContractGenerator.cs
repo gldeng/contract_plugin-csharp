@@ -1,5 +1,4 @@
 using System.Text;
-using ContractGeneratorLibrary;
 using Google.Protobuf.Compiler;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
@@ -66,7 +65,7 @@ public class ContractGenerator
             var csharpContainer = new ContractContainerGenerator();
             foreach (var serviceDescriptor in fileDescriptor.Services)
             {
-                output.AppendLine(csharpContainer.Generate(serviceDescriptor, flag));
+                output.AppendLine(ContractContainerGenerator.Generate(serviceDescriptor, flag));
             }
 
             //TODO Experiment with Roslyn-programmatic code-formatter

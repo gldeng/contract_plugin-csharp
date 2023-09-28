@@ -1,8 +1,6 @@
-using Google.Protobuf;
 using Google.Protobuf.Reflection;
-using Google.Protobuf.Compiler;
 
-namespace ContractGeneratorLibrary;
+namespace ContractGenerator;
 
 public class ContractEventClassGenerator
 {

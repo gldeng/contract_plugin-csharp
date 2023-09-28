@@ -1,11 +1,11 @@
 using Google.Protobuf.Reflection;
 
-namespace ContractGeneratorLibrary;
+namespace ContractGenerator;
 
 public class ProtoUtils
 {
     //TODO Implement https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L73
-    public static string GetClassName(DescriptorBase descriptor,byte flags)
+    public static string GetClassName(DescriptorBase descriptor)
     {
         return ToCSharpName(descriptor.FullName, descriptor.File);
     }
@@ -37,13 +37,13 @@ public class ProtoUtils
 
         return "global::" + result + classname;
     }
-    
+
     //TODO Implement https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/csharp_helpers.cc#L255C35-L255C50
     string GetPropertyName(FieldDescriptor descriptor)
     {
         // TODO: consider introducing csharp_property_name field option
         string propertyName = UnderscoresToPascalCase(GetFieldName(descriptor));
-    
+
         // Avoid either our own type name or reserved names. Note that not all names
         // are reserved - a field called to_string, write_to etc would still cause a problem.
         // There are various ways of ending up with naming collisions, but we try to avoid obvious
@@ -54,10 +54,10 @@ public class ProtoUtils
         {
             propertyName += "_";
         }
-    
+
         return propertyName;
     }
-    
+
     // Groups are hacky:  The name of the field is just the lower-cased name
     // of the group type.  In C#, though, we would like to retain the original
     // capitalization of the type name.
@@ -73,15 +73,14 @@ public class ProtoUtils
         }
     }
 
-    
     private string UnderscoresToPascalCase(string input) {
         return UnderscoresToCamelCase(input, true);
     }
-    
+
     private string UnderscoresToCamelCase(string input, bool capNextLetter) {
         return UnderscoresToCamelCase(input, capNextLetter, false);
     }
-    
+
     /// <summary>
     /// Extract the C# Namespace for the target contract based on the Proto data.
     /// </summary>
