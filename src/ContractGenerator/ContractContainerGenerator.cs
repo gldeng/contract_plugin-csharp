@@ -1,11 +1,10 @@
-using Google.Protobuf.Compiler;
+using System.Text;
 using Google.Protobuf.Reflection;
-using Google.Protobuf;
 
 // using Microsoft.CodeAnalysis.CSharp;
 // using static Microsoft.CodeAnalysis.SyntaxNode;
 
-namespace ContractGeneratorLibrary;
+namespace ContractGenerator;
 
 // Generates the overall "container" for the generated C# contract
 public class ContractContainerGenerator
@@ -33,7 +32,27 @@ public class ContractContainerGenerator
     //TODO Implement based on https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L422
     private string GenerateContractBaseClass(ServiceDescriptor service)
     {
-        throw new NotImplementedException();
+        StringBuilder output = new StringBuilder();
+        string serverClassName = ServiceHelper.GetServerClassName(service);
+        output.AppendLine(
+            $"/// <summary>Base class for the contract of {serverClassName}</summary>\n");
+        output.AppendLine($"public abstract partial class {serverClassName} : AElf.Sdk.CSharp.CSharpSmartContract<{ServiceHelper.GetStateTypeName(service)}>\n");
+        output.AppendLine("{\n");
+        // out->Indent();
+        List<MethodDescriptor> methods = ServiceHelper.GetFullMethod(service);
+        foreach(var method in methods)
+        {
+            var returnTypeServer = ServiceHelper.GetMethodReturnTypeServer(method);
+            output.AppendLine($"public abstract {returnTypeServer} {method}($request$$response_stream_maybe$);\n");
+            // "methodname", method->name(),
+            // "returntype", GetMethodReturnTypeServer(method),
+            // "request", GetMethodRequestParamServer(method),
+            // "response_stream_maybe", GetMethodResponseStreamMaybe(method));
+        }
+        // out->Outdent();
+        output.AppendLine("}\n");
+        output.AppendLine("\n");
+        return output.ToString();
     }
 
     /// <summary>
@@ -50,7 +69,7 @@ public class ContractContainerGenerator
     {
         throw new NotImplementedException();
     }
-    
+
     /// <summary>
     /// Generates the Class for the ReferenceState as part of the aelf contract
     /// </summary>
@@ -87,7 +106,7 @@ public class ContractContainerGenerator
         // request.ProtoFile[0].SourceCodeInfo.Location[0] this object can be extracted from CodeGeneratorRequest
         throw new NotImplementedException();
     }
-    
+
     private static string GetServerClassName(ServiceDescriptor service)
     {
         return service.Name + "Base";
