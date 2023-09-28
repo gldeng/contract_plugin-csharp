@@ -70,13 +70,13 @@ public class ProtoUtils
     // Groups are hacky:  The name of the field is just the lower-cased name
     // of the group type.  In C#, though, we would like to retain the original
     // capitalization of the type name.
-    private string GetFieldName(FieldDescriptor descriptor)
+    private static string GetFieldName(FieldDescriptor descriptor)
     {
         return descriptor.FieldType == FieldType.Group ? descriptor.MessageType.Name : descriptor.Name;
     }
 
 
-    private string UnderscoresToPascalCase(string input) {
+    private static string UnderscoresToPascalCase(string input) {
         return UnderscoresToCamelCase(input, true);
     }
 
