@@ -12,6 +12,7 @@ def get_command(testcase_name):
         f'-I"{testcases_dir}/_common"',
         f'-I"{testcases_dir}/{testcase_name}"',
         f'-o"{testcases_dir}/{testcase_name}/{descriptor_filename}"',
+        "--include_imports",
         proto_filename
     ]
 
