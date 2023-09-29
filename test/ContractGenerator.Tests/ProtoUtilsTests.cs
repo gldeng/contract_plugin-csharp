@@ -1,26 +1,24 @@
-using System.Text;
+using AElf;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
-using Google.Protobuf.WellKnownTypes;
-using ContractGenerator;
 
 namespace ContractGenerator.Tests;
 
 public class ProtoUtilsTests
 {
-    private static readonly ExtensionRegistry _extensionRegistry = new ExtensionRegistry();
+    private static readonly ExtensionRegistry _extensionRegistry = new();
 
     static ProtoUtilsTests()
     {
-        _extensionRegistry.Add(AElf.OptionsExtensions.Identity);
-        _extensionRegistry.Add(AElf.OptionsExtensions.Base);
-        _extensionRegistry.Add(AElf.OptionsExtensions.CsharpState);
-        _extensionRegistry.Add(AElf.OptionsExtensions.IsView);
-        _extensionRegistry.Add(AElf.OptionsExtensions.IsEvent);
-        _extensionRegistry.Add(AElf.OptionsExtensions.IsIndexed);
+        _extensionRegistry.Add(OptionsExtensions.Identity);
+        _extensionRegistry.Add(OptionsExtensions.Base);
+        _extensionRegistry.Add(OptionsExtensions.CsharpState);
+        _extensionRegistry.Add(OptionsExtensions.IsView);
+        _extensionRegistry.Add(OptionsExtensions.IsEvent);
+        _extensionRegistry.Add(OptionsExtensions.IsIndexed);
     }
 
-    private FileDescriptorSet GetFileDescriptorSet(string testcaseName)
+    private static FileDescriptorSet GetFileDescriptorSet(string testcaseName)
     {
         var descriptor = File.ReadAllBytes($@"testcases/{testcaseName}/descriptor.bin");
         return FileDescriptorSet.Parser.WithExtensionRegistry(_extensionRegistry).ParseFrom(descriptor);
@@ -38,7 +36,7 @@ public class ProtoUtilsTests
     [InlineData("foo_bar.baz", "FooBarBaz")]
     public void Test_UnderscoresToCamelCase_CapNextLetter_And_NotPreservingPeriod(string input, string output)
     {
-        var o = ProtoUtils.UnderscoresToCamelCase(input, true, false);
+        var o = ProtoUtils.UnderscoresToCamelCase(input, true);
         Assert.Equal(output, o);
     }
 
@@ -57,15 +55,41 @@ public class ProtoUtilsTests
         var fds = GetFileDescriptorSet("helloworld");
         var byteStrings = fds.File.Select(f => f.ToByteString());
         var fileDescriptors = FileDescriptor.BuildFromByteStrings(byteStrings, _extensionRegistry);
-        var svc = fileDescriptors.Last().Services.Last();
+        var svc = fileDescriptors[^1].Services.Last();
 
         var opt = svc.GetOptions();
-        var state = opt.GetExtension(AElf.OptionsExtensions.CsharpState);
+        var state = opt.GetExtension(OptionsExtensions.CsharpState);
 
         // Act: Call the GetClassName method
         var className = ProtoUtils.GetClassName(svc);
 
         // Assert: Verify the expected result
         Assert.Equal("global::AElf.Contracts.HelloWorld.HelloWorld", className);
+    }
+
+    [Fact]
+    public void GetPropertyName_ReturnsCorrectPropertyName()
+    {
+        // Arrange: Create a DescriptorBase with a known FullName and File
+        var fds = GetFileDescriptorSet("helloworld");
+        var byteStrings = fds.File.Select(f => f.ToByteString());
+        var fileDescriptors = FileDescriptor.BuildFromByteStrings(byteStrings, _extensionRegistry);
+        var svc = fileDescriptors[^1].Services.Last();
+
+        var opt = svc.GetOptions();
+        var state = opt.GetExtension(OptionsExtensions.CsharpState);
+
+        var fields = fileDescriptors[^1].MessageTypes.Last().Fields;
+
+        var fieldsList = fields.InFieldNumberOrder();
+        foreach (var field in fieldsList)
+        {
+            Assert.NotNull(field);
+            // Act: Call the GetPropertyName method
+            var propertyName = ProtoUtils.GetPropertyName(field);
+
+            // Assert: Verify the expected result
+            Assert.Equal("Value", propertyName);
+        }
     }
 }

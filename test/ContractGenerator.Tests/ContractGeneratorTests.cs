@@ -12,14 +12,14 @@ public class ContractGeneratorTests
         _output = output;
     }
 
-    private FileDescriptorSet GetFileDescriptorSet(string testcaseName)
+    private static FileDescriptorSet GetFileDescriptorSet(string testcaseName)
     {
         var descriptor = File.ReadAllBytes($@"testcases/{testcaseName}/descriptor.bin");
         return FileDescriptorSet.Parser.ParseFrom(descriptor);
     }
 
     [Fact]
-    void Test()
+    private void Test()
     {
         var fds = GetFileDescriptorSet("helloworld");
         var filenames = string.Join("\n", fds.File.Select(f => f.Name));
