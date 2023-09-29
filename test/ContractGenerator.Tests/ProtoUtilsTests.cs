@@ -56,11 +56,11 @@ public class ProtoUtilsTests
         var emptyDescRef = EmptyReflection.Descriptor.ToProto().ToByteString();
         var wrappersDescRef = WrappersReflection.Descriptor.ToProto().ToByteString();
         var descriptorRef = DescriptorReflection.Descriptor.ToProto().ToByteString();
-
         var byteStrings = fds.File.Select(f => f.ToByteString());
-        var fileDescriptors = FileDescriptor.BuildFromByteStrings(new []{
-            aelfOptionsDescriptor,emptyDescRef,wrappersDescRef,descriptorRef,fds.File[0].ToByteString()
-        });
+        // var fileDescriptors = FileDescriptor.BuildFromByteStrings(new []{
+        //     aelfOptionsDescriptor,emptyDescRef,wrappersDescRef,descriptorRef,fds.File[0].ToByteString()
+        // });
+        var fileDescriptors = FileDescriptor.BuildFromByteStrings(byteStrings);
         // Act: Call the GetClassName method
         var className = ProtoUtils.GetClassName(fileDescriptors[0]);
 
