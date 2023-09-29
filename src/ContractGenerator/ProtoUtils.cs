@@ -5,7 +5,7 @@ namespace ContractGenerator;
 public class ProtoUtils
 {
     //TODO Implement https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L73
-    public static string GetClassName(DescriptorBase descriptor,char flags)
+    public static string GetClassName(IDescriptor descriptor)
     {
         return ToCSharpName(descriptor.FullName, descriptor.File);
     }
@@ -76,7 +76,7 @@ public class ProtoUtils
     }
 
 
-    private static string UnderscoresToPascalCase(string input) {
+    internal static string UnderscoresToPascalCase(string input) {
         return UnderscoresToCamelCase(input, true);
     }
 
