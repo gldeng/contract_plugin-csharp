@@ -27,6 +27,7 @@ public class ProtoUtils
             name[(fileDescriptor.Package.Length + 1)..];
 
         classname = classname.Replace(".", ".Types.");
+        classname = classname.Replace(".proto", "");//strip-out the .proto
 
         return "global::" + result + classname;
     }

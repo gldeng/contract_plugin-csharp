@@ -55,34 +55,17 @@ public class ProtoUtilsTests
     {
         // Arrange: Create a DescriptorBase with a known FullName and File
         var fds = GetFileDescriptorSet("helloworld");
-
-        // List<string> dependencys = new List<string>();
-        // foreach (var dependency in fds.File[0].Dependency)
-        // {
-        //     Console.WriteLine("dependancy:"+dependency);
-        //     dependencys.Add(dependency);
-        // }
-        //
-
-        var aelfOptionsDescriptor = AElf.OptionsReflection.Descriptor.ToProto().ToByteString();
-        var emptyDescRef = EmptyReflection.Descriptor.ToProto().ToByteString();
-        var wrappersDescRef = WrappersReflection.Descriptor.ToProto().ToByteString();
-        var descriptorRef = DescriptorReflection.Descriptor.ToProto().ToByteString();
         var byteStrings = fds.File.Select(f => f.ToByteString());
-        // var fileDescriptors = FileDescriptor.BuildFromByteStrings(new []{
-        //     aelfOptionsDescriptor,emptyDescRef,wrappersDescRef,descriptorRef,fds.File[0].ToByteString()
-        // });
-        // var fileDescriptors = FileDescriptor.BuildFromByteStrings(byteStrings);
-
         var fileDescriptors = FileDescriptor.BuildFromByteStrings(byteStrings, _extensionRegistry);
         var svc = fileDescriptors.Last().Services.Last();
 
         var opt = svc.GetOptions();
         var state = opt.GetExtension(AElf.OptionsExtensions.CsharpState);
+
         // Act: Call the GetClassName method
-        var className = ProtoUtils.GetClassName(fileDescriptors[0]);
+        var className = ProtoUtils.GetClassName(svc);
 
         // Assert: Verify the expected result
-        Assert.Equal("HelloWorld", className);
+        Assert.Equal("global::AElf.Contracts.HelloWorld.HelloWorld", className);
     }
 }
