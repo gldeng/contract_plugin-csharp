@@ -41,7 +41,7 @@ public class ContractGenerator
     /// </summary>
     private static bool IsIndexedField(FieldDescriptor field)
     {
-        return field.GetOptions().GetExtension(OptionsExtensions.IsIndexed);
+        return field.GetOptions() != null && field.GetOptions().GetExtension(OptionsExtensions.IsIndexed);
     }
 
     public static void GenerateEvent(ref IndentPrinter printer, MessageDescriptor message, byte flags)
@@ -62,6 +62,7 @@ public class ContractGenerator
                 var fields = message.Fields.InFieldNumberOrder();
                 foreach (var field in fields)
                 {
+                    if (field == null) continue;
                     if (!IsIndexedField(field)) continue;
                     printer.Print($"new {message.Name}");
                     printer.Print("{");
@@ -91,6 +92,7 @@ public class ContractGenerator
                     var fields = message.Fields.InFieldNumberOrder();
                     foreach (var field in fields)
                     {
+                        if (field == null) continue;
                         if (IsIndexedField(field)) continue;
                         var propertyName = ProtoUtils.GetPropertyName(field);
                         printer.Print($"{propertyName} = {propertyName},");
