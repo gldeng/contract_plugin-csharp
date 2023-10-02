@@ -50,8 +50,7 @@ public class ContractGeneratorTests
 
         ContractGenerator.GenerateEvent(ref indentPrinter, msg, FlagConstants.GenerateEvent);
         var eventCodeStr = indentPrinter.PrintOut();
-        var expectedCodeStr =
-            "public partial class UpdatedMessage : aelf::IEvent<UpdatedMessage>\n{\n  public global::System.Collections.Generic.IEnumerable<UpdatedMessage> GetIndexed()\n  {\n    return new List<UpdatedMessage>\n    {\n    };\n  }\n\n  public UpdatedMessage GetNonIndexed()\n  {\n    return new UpdatedMessage\n    {\n      Value = Value,\n    };\n  }\n}\n\n";
+        const string expectedCodeStr = "public partial class UpdatedMessage : aelf::IEvent<UpdatedMessage>\n{\n  public global::System.Collections.Generic.IEnumerable<UpdatedMessage> GetIndexed()\n  {\n    return new List<UpdatedMessage>\n    {\n    };\n  }\n\n  public UpdatedMessage GetNonIndexed()\n  {\n    return new UpdatedMessage\n    {\n      Value = Value,\n    };\n  }\n}\n\n";
         Assert.Equal(expectedCodeStr, eventCodeStr);
     }
 }
