@@ -1,14 +1,12 @@
 using AElf;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
-using Xunit.Abstractions;
 
 namespace ContractGenerator.Tests;
 
 public class ContractGeneratorTests
 {
     private static readonly ExtensionRegistry _extensionRegistry = new();
-    private readonly ITestOutputHelper _output;
 
     static ContractGeneratorTests()
     {
@@ -20,23 +18,10 @@ public class ContractGeneratorTests
         _extensionRegistry.Add(OptionsExtensions.IsIndexed);
     }
 
-    public ContractGeneratorTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
     private static FileDescriptorSet GetFileDescriptorSet(string testcaseName)
     {
         var descriptor = File.ReadAllBytes($@"testcases/{testcaseName}/descriptor.bin");
         return FileDescriptorSet.Parser.WithExtensionRegistry(_extensionRegistry).ParseFrom(descriptor);
-    }
-
-    [Fact]
-    private void Test()
-    {
-        var fds = GetFileDescriptorSet("helloworld");
-        var filenames = string.Join("\n", fds.File.Select(f => f.Name));
-        _output.WriteLine($"Got files:\n {filenames}");
     }
 
     [Fact]
@@ -50,7 +35,8 @@ public class ContractGeneratorTests
 
         ContractGenerator.GenerateEvent(ref indentPrinter, msg, FlagConstants.GenerateEvent);
         var eventCodeStr = indentPrinter.PrintOut();
-        const string expectedCodeStr = "public partial class UpdatedMessage : aelf::IEvent<UpdatedMessage>\n{\n  public global::System.Collections.Generic.IEnumerable<UpdatedMessage> GetIndexed()\n  {\n    return new List<UpdatedMessage>\n    {\n    };\n  }\n\n  public UpdatedMessage GetNonIndexed()\n  {\n    return new UpdatedMessage\n    {\n      Value = Value,\n    };\n  }\n}\n\n";
+        const string expectedCodeStr =
+            "public partial class UpdatedMessage : aelf::IEvent<UpdatedMessage>\n{\n  public global::System.Collections.Generic.IEnumerable<UpdatedMessage> GetIndexed()\n  {\n    return new List<UpdatedMessage>\n    {\n    };\n  }\n\n  public UpdatedMessage GetNonIndexed()\n  {\n    return new UpdatedMessage\n    {\n      Value = Value,\n    };\n  }\n}\n\n";
         Assert.Equal(expectedCodeStr, eventCodeStr);
     }
 }
