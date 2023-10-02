@@ -22,7 +22,7 @@ public class IndentPrinter
     public void Print(string str)
     {
         var indentedStr = "";
-        for (var i = 0; i < _indents; i++) indentedStr += " ";
+        for (var i = 0; i < _indents; i++) indentedStr += "  ";
         _stringBuilder.AppendLine(indentedStr + str);
     }
 

@@ -9,7 +9,7 @@ public class IndentPrinterTests
         indentPrinter.Indent();
         indentPrinter.Print("test func()");
         var outputCode = indentPrinter.PrintOut();
-        Assert.Equal(" test func()\n", outputCode);
+        Assert.Equal("  test func()\n", outputCode);
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class IndentPrinterTests
         indentPrinter.Outdent();
         indentPrinter.Print("//done");
         var outputCode = indentPrinter.PrintOut();
-        Assert.Equal(" test func(){\n  var someFields = new SomeField();\n }\n//done\n", outputCode);
+        Assert.Equal("  test func(){\n    var someFields = new SomeField();\n  }\n//done\n", outputCode);
     }
 
     [Fact]
