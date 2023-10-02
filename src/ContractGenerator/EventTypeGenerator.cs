@@ -5,7 +5,7 @@ namespace ContractGenerator;
 
 public static class EventTypeGenerator
 {
-    public static void GenerateEvent(ref IndentPrinter printer, MessageDescriptor message, byte flags)
+    public static void GenerateEvent(IndentPrinter printer, MessageDescriptor message, byte flags)
     {
         if (!IsEventMessageType(message)) return;
         printer.Print(
