@@ -4,8 +4,8 @@ namespace ContractGenerator;
 
 public class IndentPrinter
 {
-    private int _indents;
     private readonly StringBuilder _stringBuilder = new();
+    private int _indents;
 
     public void Indent()
     {
@@ -21,9 +21,8 @@ public class IndentPrinter
 
     public void Print(string str)
     {
-        var indentedStr = "";
-        for (var i = 0; i < _indents; i++) indentedStr += "  ";
-        _stringBuilder.AppendLine(indentedStr + str);
+        for (var i = 0; i < _indents; i++) _stringBuilder.Append("  ");
+        _stringBuilder.AppendLine(str);
     }
 
     public string PrintOut()
