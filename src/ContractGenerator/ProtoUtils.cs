@@ -5,7 +5,7 @@ namespace ContractGenerator;
 public class ProtoUtils
 {
     //TODO Implement https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L73
-    public static string GetClassName(DescriptorBase descriptor)
+    public static string GetClassName(IDescriptor descriptor)
     {
         return ToCSharpName(descriptor.FullName, descriptor.File);
     }
@@ -19,22 +19,39 @@ public class ProtoUtils
         var result = GetFileNamespace(fileDescriptor);
         if (!string.IsNullOrEmpty(result)) result += '.';
 
-        string classname;
-        if (string.IsNullOrEmpty(fileDescriptor.Package))
-            classname = name;
-        else
+        var classname = string.IsNullOrEmpty(fileDescriptor.Package)
+            ? name
+            :
             // Strip the proto package from full_name since we've replaced it with
             // the C# namespace.
-            classname = name.Substring(fileDescriptor.Package.Length + 1);
+            name[(fileDescriptor.Package.Length + 1)..];
 
         classname = classname.Replace(".", ".Types.");
-
+        classname = classname.Replace(".proto", ""); //strip-out the .proto
         return "global::" + result + classname;
     }
 
-    //TODO Implement https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/csharp_helpers.cc#L255C35-L255C50
-    private string GetPropertyName(FieldDescriptor descriptor)
+    /// <summary>
+    ///     This Util gets the PropertyName based on the proto. Copied from the C++ original
+    ///     https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/csharp_helpers.cc#L255C35-L255C50
+    /// </summary>
+    public static string GetPropertyName(FieldDescriptor descriptor)
     {
+        var reservedMemberNames = new HashSet<string>
+        {
+            "Types",
+            "Descriptor",
+            "Equals",
+            "ToString",
+            "GetHashCode",
+            "WriteTo",
+            "Clone",
+            "CalculateSize",
+            "MergeFrom",
+            "OnConstruction",
+            "Parser"
+        };
+
         // TODO: consider introducing csharp_property_name field option
         var propertyName = UnderscoresToPascalCase(GetFieldName(descriptor));
 
@@ -43,8 +60,7 @@ public class ProtoUtils
         // There are various ways of ending up with naming collisions, but we try to avoid obvious
         // ones.
         if (propertyName == descriptor.ContainingType.Name
-            || propertyName == "Types"
-            || propertyName == "Descriptor")
+            || reservedMemberNames.Contains(propertyName))
             propertyName += "_";
 
         return propertyName;
@@ -53,73 +69,74 @@ public class ProtoUtils
     // Groups are hacky:  The name of the field is just the lower-cased name
     // of the group type.  In C#, though, we would like to retain the original
     // capitalization of the type name.
-    public string GetFieldName(FieldDescriptor descriptor)
+    private static string GetFieldName(FieldDescriptor descriptor)
     {
-        if (descriptor.FieldType == FieldType.Group)
-            return descriptor.MessageType.Name;
-        return descriptor.Name;
+        return descriptor.FieldType == FieldType.Group ? descriptor.MessageType.Name : descriptor.Name;
     }
 
-    private string UnderscoresToPascalCase(string input)
+
+    internal static string UnderscoresToPascalCase(string input)
     {
         return UnderscoresToCamelCase(input, true);
-    }
-
-    private string UnderscoresToCamelCase(string input, bool capNextLetter)
-    {
-        return UnderscoresToCamelCase(input, capNextLetter, false);
     }
 
     /// <summary>
     ///     Extract the C# Namespace for the target contract based on the Proto data.
     /// </summary>
     //TODO Implementation https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L66
-    public static string GetFileNamespace(FileDescriptor fileDescriptor)
+    private static string GetFileNamespace(FileDescriptor fileDescriptor)
     {
-        if (fileDescriptor.GetOptions().HasCsharpNamespace) return fileDescriptor.GetOptions().CsharpNamespace;
-        return UnderscoresToCamelCase(fileDescriptor.Package, true, true);
+        return fileDescriptor.GetOptions().HasCsharpNamespace
+            ? fileDescriptor.GetOptions().CsharpNamespace
+            : UnderscoresToCamelCase(fileDescriptor.Package, true, true);
     }
 
     /// <summary>
     ///     This Util does more than just convert underscores to camel-case. copied from the C++ original
     ///     https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L138
     /// </summary>
-    public static string UnderscoresToCamelCase(string input, bool capNextLetter, bool preservePeriod)
+    internal static string UnderscoresToCamelCase(string input, bool capNextLetter, bool preservePeriod = false)
     {
         var result = "";
         for (var i = 0; i < input.Length; i++)
-            if ('a' <= input[i] && input[i] <= 'z')
+            switch (input[i])
             {
-                if (capNextLetter)
-                    result += (char)(input[i] + ('A' - 'a'));
-                else
+                case >= 'a' and <= 'z':
+                {
+                    if (capNextLetter)
+                        result += (char)(input[i] + ('A' - 'a'));
+                    else
+                        result += input[i];
+                    capNextLetter = false;
+                    break;
+                }
+                case >= 'A' and <= 'Z':
+                {
+                    if (i == 0 && !capNextLetter)
+                        // Force first letter to lower-case unless explicitly told to
+                        // capitalize it.
+                        result += (char)(input[i] + ('a' - 'A'));
+                    else
+                        // Capital letters after the first are left as-is.
+                        result += input[i];
+                    capNextLetter = false;
+                    break;
+                }
+                case >= '0' and <= '9':
                     result += input[i];
-                capNextLetter = false;
-            }
-            else if ('A' <= input[i] && input[i] <= 'Z')
-            {
-                if (i == 0 && !capNextLetter)
-                    // Force first letter to lower-case unless explicitly told to
-                    // capitalize it.
-                    result += (char)(input[i] + ('a' - 'A'));
-                else
-                    // Capital letters after the first are left as-is.
-                    result += input[i];
-                capNextLetter = false;
-            }
-            else if ('0' <= input[i] && input[i] <= '9')
-            {
-                result += input[i];
-                capNextLetter = true;
-            }
-            else
-            {
-                capNextLetter = true;
-                if (input[i] == '.' && preservePeriod) result += '.';
+                    capNextLetter = true;
+                    break;
+                default:
+                {
+                    capNextLetter = true;
+                    if (input[i] == '.' && preservePeriod) result += '.';
+
+                    break;
+                }
             }
 
         // Add a trailing "_" if the name should be altered.
-        if (input.Length > 0 && input[input.Length - 1] == '#') result += '_';
+        if (input.Length > 0 && input[^1] == '#') result += '_';
 
         // https://github.com/protocolbuffers/protobuf/issues/8101
         // To avoid generating invalid identifiers - if the input string
