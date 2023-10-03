@@ -108,9 +108,22 @@ public class ContractContainerGenerator
     ///     Generates a section of instantiated aelf Marshallers as part of the contract
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L332
-    private static string GenerateMarshallerFields(ServiceDescriptor serviceDescriptor)
+    private static string GenerateMarshallerFields(IndentPrinter indentPrinter,ServiceDescriptor serviceDescriptor)
     {
-        throw new NotImplementedException();
+        indentPrinter.Print("#region Marshallers");
+        List<IDescriptor> usedMessages = GetUsedMessages(service);
+        for (size_t i = 0; i < used_messages.size(); i++) {
+            const Descriptor* message = used_messages[i];
+                out->Print(
+                "static readonly aelf::Marshaller<$type$> $fieldname$ = "
+            "aelf::Marshallers.Create((arg) => "
+            "global::Google.Protobuf.MessageExtensions.ToByteArray(arg), "
+            "$type$.Parser.ParseFrom);\n",
+            "fieldname", GetMarshallerFieldName(message), "type",
+            GetClassName(message));
+        }
+        out->Print("#endregion\n");
+            out->Print("\n");
     }
 
     /// <summary>
@@ -234,13 +247,53 @@ public class ContractContainerGenerator
         return services.SelectMany(serviceItem => serviceItem.Methods).ToList();
     }
 
+    private static string GetServiceNameFieldName(ServiceDescriptor serviceDescriptor)
+    {
+        return "__ServiceName";
+    }
+
     /// <summary>
     ///     Generate will produce a chunk of C# code that serves as the container class of the AElf Contract.
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L612
-    public static string Generate(ServiceDescriptor serviceDescriptor, byte flags)
+    public static string Generate(IndentPrinter indentPrinter,ServiceDescriptor serviceDescriptor, byte flags)
     {
-        throw new NotImplementedException();
+        // GenerateDocCommentBody(serviceDescriptor,)
+        indentPrinter.Print($"{ProtoUtils.GetAccessLevel(flags)} static partial class {GetServiceContainerClassName(serviceDescriptor)}",);
+            indentPrinter.Print("{");
+            indentPrinter.Indent();
+            indentPrinter.Print($"static readonly string {GetServiceNameFieldName()} = \"{serviceDescriptor.FullName}\";\n");
+
+        GenerateMarshallerFields(indentPrinter, serviceDescriptor);
+            indentPrinter.Print("#region Methods\n");
+        Methods methods = GetFullMethod(serviceDescriptor);
+        for(Methods::iterator itr = methods.begin(); itr != methods.end(); ++itr) {
+            GenerateStaticMethodField(indentPrinter, *itr);
+        }
+        indentPrinter.Print("#endregion\n");
+            indentPrinter.Print("\n");
+
+            indentPrinter.Print("#region Descriptors\n");
+        GenerateServiceDescriptorProperty(indentPrinter, serviceDescriptor);
+            indentPrinter.Print("\n");
+        GenerateAllServiceDescriptorsProperty(indentPrinter, serviceDescriptor);
+            indentPrinter.Print("#endregion\n");
+            indentPrinter.Print("\n");
+
+        if (NeedContract(flags)) {
+            GenerateContractBaseClass(indentPrinter, serviceDescriptor);
+            GenerateBindServiceMethod(indentPrinter, service);
+        }
+
+        if(NeedStub(flags)) {
+            GenerateStubClass(out, service);
+        }
+
+        if(NeedReference(flags)){
+            GenerateReferenceClass(out, service, flags);
+        }
+        indentPrinter.Outdent();
+            indentPrinter.Print("}\n");
     }
 
     private enum MethodType
