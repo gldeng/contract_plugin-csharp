@@ -1,4 +1,3 @@
-using System.Text;
 using AElf;
 using Google.Protobuf.Reflection;
 
@@ -14,24 +13,21 @@ public class ContractContainerGenerator
     ///     Generate will produce a chunk of C# code BaseClass for the AElf Contract. based on C++ original
     ///     https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L422
     /// </summary>
-    private static string GenerateContractBaseClass(ServiceDescriptor service)
+    private static void GenerateContractBaseClass(IndentPrinter indentPrinter, ServiceDescriptor service)
     {
-        var output = new StringBuilder();
         var serverClassName = GetServerClassName(service);
-        output.AppendLine(
-            $"/// <summary>Base class for the contract of {serverClassName}</summary>\n");
-        output.AppendLine(
-            $"public abstract partial class {serverClassName} : AElf.Sdk.CSharp.CSharpSmartContract<{GetStateTypeName(service)}>\n");
-        output.AppendLine("{\n");
-        // out->Indent();
+        indentPrinter.Print(
+            $"/// <summary>Base class for the contract of {serverClassName}</summary>");
+        indentPrinter.Print(
+            $"public abstract partial class {serverClassName} : AElf.Sdk.CSharp.CSharpSmartContract<{GetStateTypeName(service)}>");
+        indentPrinter.Print("{");
+        indentPrinter.Indent();
         var methods = GetFullMethod(service);
         foreach (var method in methods)
-            output.AppendLine(
-                $"public abstract {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)});\n");
-        // out->Outdent();
-        output.AppendLine("}\n");
-        output.AppendLine("\n");
-        return output.ToString();
+            indentPrinter.Print(
+                $"public abstract {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)});");
+        indentPrinter.Outdent();
+        indentPrinter.Print("}\n");
     }
 
     private static string GetMethodReturnTypeServer(MethodDescriptor method)
@@ -82,13 +78,13 @@ public class ContractContainerGenerator
     ///     Generates instantiations for static readonly aelf::Method fields based on the proto
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L349
-    private string GenerateStaticMethodField(MethodDescriptor methodDescriptor)
+    private static string GenerateStaticMethodField(MethodDescriptor methodDescriptor)
     {
         throw new NotImplementedException();
     }
 
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L484
-    private string GenerateStubClass(ServiceDescriptor serviceDescriptor)
+    private static string GenerateStubClass(ServiceDescriptor serviceDescriptor)
     {
         throw new NotImplementedException();
     }
@@ -130,7 +126,7 @@ public class ContractContainerGenerator
         throw new NotImplementedException();
     }
 
-    private static string GetServerClassName(ServiceDescriptor service)
+    private static string GetServerClassName(IDescriptor service)
     {
         return service.Name + "Base";
     }
@@ -153,14 +149,14 @@ public class ContractContainerGenerator
     }
 
     //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L115
-    private static string GetServiceContainerClassName(ServiceDescriptor service)
+    private static string GetServiceContainerClassName(IDescriptor service)
     {
         //TODO service null check
         return $"{service.Name}Container";
     }
 
     //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L204
-    private static List<ServiceDescriptor> GetFullService(ServiceDescriptor service)
+    private static IEnumerable<ServiceDescriptor> GetFullService(ServiceDescriptor service)
     {
         var allDependedServices = new List<ServiceDescriptor>();
         var seen = new SortedSet<ServiceDescriptor>();
@@ -191,7 +187,7 @@ public class ContractContainerGenerator
     }
 
     private static void DepthFirstSearchForBase(ServiceDescriptor service, ref List<string> list,
-        ref SortedSet<string> seen, Dictionary<string, ServiceDescriptor> allServices)
+        ref SortedSet<string> seen, IReadOnlyDictionary<string, ServiceDescriptor> allServices)
     {
         if (!seen.Add(service.File.Name)) return;
 
