@@ -10,9 +10,12 @@ public class ProtoUtils
         return ToCSharpName(descriptor.FullName, descriptor.File);
     }
 
-    // public string GetAccessLevel(uint flags) {
-    //     return flags & Flags.INTERNAL_ACCESS ? "internal" : "public";
-    // }
+    //TODO Implementation https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
+    public static string GetAccessLevel(byte flags)
+    {
+        throw new NotImplementedException();
+        //     return flags & Flags.INTERNAL_ACCESS ? "internal" : "public";
+    }
 
     private static string ToCSharpName(string name, FileDescriptor fileDescriptor)
     {

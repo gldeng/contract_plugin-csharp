@@ -1,9 +1,6 @@
 using AElf;
 using Google.Protobuf.Reflection;
 
-// using Microsoft.CodeAnalysis.CSharp;
-// using static Microsoft.CodeAnalysis.SyntaxNode;
-
 namespace ContractGenerator;
 
 // Generates the overall "container" for the generated C# contract
@@ -13,7 +10,7 @@ public class ContractContainerGenerator
     ///     Generate will produce a chunk of C# code BaseClass for the AElf Contract. based on C++ original
     ///     https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L422
     /// </summary>
-    private static void GenerateContractBaseClass(IndentPrinter indentPrinter, ServiceDescriptor service)
+    protected internal static void GenerateContractBaseClass(IndentPrinter indentPrinter, ServiceDescriptor service)
     {
         var serverClassName = GetServerClassName(service);
         indentPrinter.Print(
@@ -142,12 +139,6 @@ public class ContractContainerGenerator
         throw new NotImplementedException();
     }
 
-    //TODO Implementation https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
-    private static string GetAccessLevel(byte flags)
-    {
-        throw new NotImplementedException();
-    }
-
     //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L115
     private static string GetServiceContainerClassName(IDescriptor service)
     {
@@ -178,7 +169,10 @@ public class ContractContainerGenerator
 
     private static int GetServiceBaseCount(ServiceDescriptor service)
     {
-        return service.GetOptions().GetExtension(OptionsExtensions.Base).Count;
+        if (service.GetOptions().GetExtension(OptionsExtensions.Base) == null) return 0;
+        return service.GetOptions().GetExtension(OptionsExtensions.Base).Count == 0
+            ? 0
+            : service.GetOptions().GetExtension(OptionsExtensions.Base).Count;
     }
 
     private static string GetServiceBase(ServiceDescriptor service, int index)
