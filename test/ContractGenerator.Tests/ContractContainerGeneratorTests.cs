@@ -1,17 +1,7 @@
-using Google.Protobuf.Reflection;
-
 namespace ContractGenerator.Tests;
 
-public class ContractContainerGeneratorTests
+public class ContractContainerGeneratorTests : TestBase
 {
-    //TODO Replace with TestBase once rebased
-    protected static IReadOnlyList<FileDescriptor> GetFileDescriptors(string testcaseName)
-    {
-        using var stream = File.Open($"testcases/{testcaseName}/descriptor.bin", FileMode.Open);
-
-        return FileDescriptorSetLoader.Load(stream);
-    }
-
     [Fact]
     public void TestGenerateContractBaseClass_NoErrors()
     {

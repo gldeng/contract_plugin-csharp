@@ -10,11 +10,10 @@ public class ProtoUtils
         return ToCSharpName(descriptor.FullName, descriptor.File);
     }
 
-    //TODO Implementation https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
+    // Implementation follows C++ original https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
     public static string GetAccessLevel(byte flags)
     {
-        throw new NotImplementedException();
-        //     return flags & Flags.INTERNAL_ACCESS ? "internal" : "public";
+        return (flags & FlagConstants.InternalAccess) != 0 ? "internal" : "public";
     }
 
     private static string ToCSharpName(string name, FileDescriptor fileDescriptor)
