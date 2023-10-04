@@ -10,6 +10,36 @@ public class ProtoUtils
         return ToCSharpName(descriptor.FullName, descriptor.File);
     }
 
+    public static string GetReflectionClassName(FileDescriptor descriptor)
+    {
+        var result = GetFileNamespace(descriptor);
+        if (result.Length > 0) result += '.';
+        result += GetReflectionClassUnqualifiedName(descriptor);
+        return "global::" + result;
+    }
+
+    private static string GetFileNameBase(IDescriptor descriptor)
+    {
+        var protoFile = descriptor.Name;
+        var lastSlash = protoFile.LastIndexOf('/');
+        var stringBase = protoFile[(lastSlash + 1)..];
+        return UnderscoresToPascalCase(StripDotProto(stringBase));
+    }
+
+    private static string StripDotProto(string protoFile)
+    {
+        var lastIndex = protoFile.LastIndexOf(".", StringComparison.Ordinal);
+        return protoFile[..lastIndex];
+    }
+
+    public static string GetReflectionClassUnqualifiedName(FileDescriptor descriptor)
+    {
+        // TODO: Detect collisions with existing messages,
+        // and append an underscore if necessary.
+        return GetFileNameBase(descriptor) + "Reflection";
+    }
+
+
     // Implementation follows C++ original https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
     public static string GetAccessLevel(byte flags)
     {

@@ -1,5 +1,3 @@
-using AElf;
-using Google.Protobuf;
 using Google.Protobuf.Reflection;
 
 namespace ContractGenerator.Tests;
