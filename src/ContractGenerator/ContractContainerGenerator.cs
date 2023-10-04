@@ -150,7 +150,7 @@ public class ContractContainerGenerator
     private static IEnumerable<ServiceDescriptor> GetFullService(ServiceDescriptor service)
     {
         var allDependedServices = new List<ServiceDescriptor>();
-        var seen = new SortedSet<ServiceDescriptor>();
+        var seen = new SortedSet<ServiceDescriptor>(new ServiceDescriptorComparer());
         DepthFirstSearch(service, ref allDependedServices, ref seen);
         var services = allDependedServices.ToDictionary(dependedService => dependedService.File.Name);
         var result = new List<ServiceDescriptor>();
@@ -169,6 +169,7 @@ public class ContractContainerGenerator
 
     private static int GetServiceBaseCount(ServiceDescriptor service)
     {
+        if (service.GetOptions() == null) return 0;
         if (service.GetOptions().GetExtension(OptionsExtensions.Base) == null) return 0;
         return service.GetOptions().GetExtension(OptionsExtensions.Base).Count == 0
             ? 0
@@ -200,6 +201,14 @@ public class ContractContainerGenerator
 
         // Add this file.
         list.Add(service.File.Name);
+    }
+
+    private class ServiceDescriptorComparer : IComparer<ServiceDescriptor>
+    {
+        public int Compare(ServiceDescriptor? x, ServiceDescriptor? y)
+        {
+            return string.Compare(x?.FullName,y?.FullName,StringComparison.Ordinal);
+        }
     }
 
     private static void DepthFirstSearch(ServiceDescriptor service, ref List<ServiceDescriptor> list,

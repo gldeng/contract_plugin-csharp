@@ -13,9 +13,6 @@
         <None Update="testcases/**/*">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="testcases\helloworld\nested_base_contract.proto">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -34,8 +31,6 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\ContractGenerator\ContractGenerator.csproj"/>
     </ItemGroup>
-
-
     <ItemGroup>
         <Folder Include="testcases\_common\"/>
     </ItemGroup>
