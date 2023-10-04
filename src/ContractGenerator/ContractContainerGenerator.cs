@@ -75,7 +75,7 @@ public class ContractContainerGenerator
     ///     Generates instantiations for static readonly aelf::Method fields based on the proto
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L349
-    private static string GenerateStaticMethodField(MethodDescriptor methodDescriptor)
+    private static string GenerateStaticMethodField(IndentPrinter indentPrinter,MethodDescriptor methodDescriptor)
     {
         throw new NotImplementedException();
     }
@@ -105,25 +105,60 @@ public class ContractContainerGenerator
     }
 
     /// <summary>
+    ///     GetMarshallerFieldName formats and returns a marshaller-fieldname based on the original C++ logic
+    ///     found here https://github.com/AElfProject/contract-plugin/blob/de625fcb79f83603e29d201c8488f101b40f573c/src/contract_csharp_generator.cc#L242
+    /// </summary>
+    private static string GetMarshallerFieldName(IDescriptor message)
+    {
+        var msgFullName = message.FullName;
+        return "__Marshaller_" + msgFullName.Replace(".", "_");
+    }
+
+    /// <summary>
+    ///     GetUsedMessages extracts messages from Proto ServiceDescriptor based on the original C++ logic
+    ///     found here https://github.com/AElfProject/contract-plugin/blob/de625fcb79f83603e29d201c8488f101b40f573c/src/contract_csharp_generator.cc#L312
+    /// </summary>
+    private static List<IDescriptor> GetUsedMessages(ServiceDescriptor service)
+    {
+        var descriptorSet = new HashSet<IDescriptor>();
+        var result = new List<IDescriptor>();
+
+        var methods = GetFullMethod(service);
+        foreach (var method in methods)
+        {
+            if (!descriptorSet.Contains(method.InputType))
+            {
+                descriptorSet.Add(method.InputType);
+                result.Add(method.InputType);
+            }
+
+            if (descriptorSet.Contains(method.OutputType)) continue;
+            descriptorSet.Add(method.OutputType);
+            result.Add(method.OutputType);
+        }
+
+        return result;
+    }
+
+
+    /// <summary>
     ///     Generates a section of instantiated aelf Marshallers as part of the contract
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L332
-    private static string GenerateMarshallerFields(IndentPrinter indentPrinter,ServiceDescriptor serviceDescriptor)
+    private static void GenerateMarshallerFields(IndentPrinter indentPrinter,ServiceDescriptor serviceDescriptor)
     {
         indentPrinter.Print("#region Marshallers");
-        List<IDescriptor> usedMessages = GetUsedMessages(service);
-        for (size_t i = 0; i < used_messages.size(); i++) {
-            const Descriptor* message = used_messages[i];
-                out->Print(
-                "static readonly aelf::Marshaller<$type$> $fieldname$ = "
-            "aelf::Marshallers.Create((arg) => "
-            "global::Google.Protobuf.MessageExtensions.ToByteArray(arg), "
-            "$type$.Parser.ParseFrom);\n",
-            "fieldname", GetMarshallerFieldName(message), "type",
-            GetClassName(message));
+        var usedMessages = GetUsedMessages(serviceDescriptor);
+        foreach(var usedMessage in usedMessages)
+        {
+            var type = ProtoUtils.GetClassName(usedMessage);
+            indentPrinter.Print(
+                $"static readonly aelf::Marshaller<{type}> {GetMarshallerFieldName(usedMessage)} = "+
+            "aelf::Marshallers.Create((arg) => "+
+            "global::Google.Protobuf.MessageExtensions.ToByteArray(arg), "+
+            $"{type}.Parser.ParseFrom);");
         }
-        out->Print("#endregion\n");
-            out->Print("\n");
+        indentPrinter.Print("#endregion\n");
     }
 
     /// <summary>
@@ -259,16 +294,16 @@ public class ContractContainerGenerator
     public static string Generate(IndentPrinter indentPrinter,ServiceDescriptor serviceDescriptor, byte flags)
     {
         // GenerateDocCommentBody(serviceDescriptor,)
-        indentPrinter.Print($"{ProtoUtils.GetAccessLevel(flags)} static partial class {GetServiceContainerClassName(serviceDescriptor)}",);
+        indentPrinter.Print($"{ProtoUtils.GetAccessLevel(flags)} static partial class {GetServiceContainerClassName(serviceDescriptor)}");
             indentPrinter.Print("{");
             indentPrinter.Indent();
-            indentPrinter.Print($"static readonly string {GetServiceNameFieldName()} = \"{serviceDescriptor.FullName}\";\n");
+            indentPrinter.Print($"static readonly string {GetServiceNameFieldName(serviceDescriptor)} = \"{serviceDescriptor.FullName}\";\n");
 
         GenerateMarshallerFields(indentPrinter, serviceDescriptor);
             indentPrinter.Print("#region Methods\n");
-        Methods methods = GetFullMethod(serviceDescriptor);
-        for(Methods::iterator itr = methods.begin(); itr != methods.end(); ++itr) {
-            GenerateStaticMethodField(indentPrinter, *itr);
+        var methods = GetFullMethod(serviceDescriptor);
+        foreach(var method in methods) {
+            GenerateStaticMethodField(indentPrinter, method);
         }
         indentPrinter.Print("#endregion\n");
             indentPrinter.Print("\n");
@@ -282,15 +317,15 @@ public class ContractContainerGenerator
 
         if (NeedContract(flags)) {
             GenerateContractBaseClass(indentPrinter, serviceDescriptor);
-            GenerateBindServiceMethod(indentPrinter, service);
+            GenerateBindServiceMethod(indentPrinter, serviceDescriptor);
         }
 
         if(NeedStub(flags)) {
-            GenerateStubClass(out, service);
+            GenerateStubClass(indentPrinter, serviceDescriptor);
         }
 
         if(NeedReference(flags)){
-            GenerateReferenceClass(out, service, flags);
+            GenerateReferenceClass(indentPrinter, serviceDescriptor, flags);
         }
         indentPrinter.Outdent();
             indentPrinter.Print("}\n");
