@@ -275,6 +275,20 @@ public class ContractContainerGenerator
         list.Add(service);
     }
 
+    private void GenerateServiceDescriptorProperty(IndentPrinter indentPrinter,
+    ServiceDescriptor service) {
+        std::ostringstream index;
+        index << service->index();
+        indentPrinter.Print(
+            "public static global::Google.Protobuf.Reflection.ServiceDescriptor "
+        "Descriptor\n");
+        indentPrinter.Print("{\n");
+        indentPrinter.Print("  get { return $umbrella$.Descriptor.Services[$index$]; }\n",
+                "umbrella", GetReflectionClassName(service.File), "index",
+                index.str());
+        indentPrinter.Print("}\n");
+    }
+
     //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L222
     private static List<MethodDescriptor> GetFullMethod(ServiceDescriptor service)
     {
