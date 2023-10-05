@@ -260,11 +260,10 @@ public class ContractContainerGenerator
         indentPrinter.Print("return aelf::ServerServiceDefinition.CreateBuilder()");
         indentPrinter.Indent();
         indentPrinter.Indent();
-        indentPrinter.Print("\n.AddDescriptors(Descriptors)");
+        indentPrinter.Print(".AddDescriptors(Descriptors)");
         var methods = GetFullMethod(service);
         foreach (var method in methods)
-            indentPrinter.Print($"\n.AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name})");
-        indentPrinter.Print(".Build();");
+            indentPrinter.Print($".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name}).Build();");
         indentPrinter.Outdent();
         indentPrinter.Outdent();
 
@@ -362,7 +361,7 @@ public class ContractContainerGenerator
         indentPrinter.Print("{");
         indentPrinter.Print(
             $"  get {{ return {ProtoUtils.GetReflectionClassName(service.File)}.Descriptor.Services[{service.Index}]; }}");
-        indentPrinter.Print("}");
+        indentPrinter.Print("}\n");
     }
 
     //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L222
@@ -479,7 +478,6 @@ public class ContractContainerGenerator
 
         indentPrinter.Print("#region Descriptors");
         GenerateServiceDescriptorProperty(indentPrinter, serviceDescriptor);
-        indentPrinter.Print("");
         GenerateAllServiceDescriptorsProperty(indentPrinter, serviceDescriptor);
         indentPrinter.Print("#endregion\n");
 
