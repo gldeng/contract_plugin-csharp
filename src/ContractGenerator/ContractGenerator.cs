@@ -1,4 +1,4 @@
-using AElf;
+using Google.Protobuf;
 using Google.Protobuf.Compiler;
 using Google.Protobuf.Reflection;
 
@@ -20,11 +20,24 @@ public class FlagConstants
 public class ContractGenerator
 {
     /// <summary>
+    ///     GetServicesFilename generates Services FileName based on the FileDescriptor
+    /// </summary>
+    private static string GetServicesFilename(FileDescriptor fileDescriptor)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
     ///     Generates a set of C# files from the input stream containing the proto source. This is the primary entry-point into
     ///     the ContractPlugin.
     /// </summary>
     public CodeGeneratorResponse Generate(Stream stdin)
     {
         throw new NotImplementedException();
+    }
+
+    private static T Deserialize<T>(Stream stream) where T : IMessage<T>, new()
+    {
+        return new MessageParser<T>(() => new T()).ParseFrom(stream);
     }
 }

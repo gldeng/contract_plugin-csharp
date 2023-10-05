@@ -10,6 +10,7 @@ public class ProtoUtils
         return ToCSharpName(descriptor.FullName, descriptor.File);
     }
 
+    // Implementation follows C++ original https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
     public static string GetAccessLevel(byte flags)
     {
         return (flags & FlagConstants.InternalAccess) != 0 ? "internal" : "public";
@@ -29,7 +30,6 @@ public class ProtoUtils
 
         classname = classname.Replace(".", ".Types.");
         classname = classname.Replace(".proto", ""); //strip-out the .proto
-
         return "global::" + result + classname;
     }
 
