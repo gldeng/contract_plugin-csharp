@@ -6,17 +6,18 @@ public class ContractContainerGeneratorTests : TestBase
     public void TestGenerateContractBaseClass_NoErrors()
     {
         var indentPrinter = new IndentPrinter();
-        var fileDescriptors = GetFileDescriptors("baseexample");
+        var fileDescriptors = GetFileDescriptors("contract_with_bases");
         var svc = fileDescriptors[^1].Services.Last();
 
         ContractContainerGenerator.GenerateContractBaseClass(indentPrinter, svc);
         var contractBaseCodeStr = indentPrinter.PrintOut();
         const string expectedCodeStr =
-            @"/// <summary>Base class for the contract of BaseExampleBase</summary>
-public abstract partial class BaseExampleBase : AElf.Sdk.CSharp.CSharpSmartContract<AElf.Contracts.BaseExample.BaseExampleState>
+            @"/// <summary>Base class for the contract of ContractWithBasesBase</summary>
+public abstract partial class ContractWithBasesBase : AElf.Sdk.CSharp.CSharpSmartContract<DummyState>
 {
+  public abstract global::Google.Protobuf.WellKnownTypes.Empty GrandParentMethod(global::Google.Protobuf.WellKnownTypes.Empty input);
+  public abstract global::Google.Protobuf.WellKnownTypes.Empty ParentMethod(global::Google.Protobuf.WellKnownTypes.Empty input);
   public abstract global::Google.Protobuf.WellKnownTypes.Empty Update(global::Google.Protobuf.WellKnownTypes.StringValue input);
-  public abstract global::Google.Protobuf.WellKnownTypes.StringValue Read(global::Google.Protobuf.WellKnownTypes.Empty input);
 }
 
 ";
