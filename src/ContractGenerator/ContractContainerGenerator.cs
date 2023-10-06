@@ -71,19 +71,68 @@ public class ContractContainerGenerator
         return method.IsServerStreaming ? MethodType.MethodtypeServerStreaming : MethodType.MethodtypeNoStreaming;
     }
 
+    private static string GetCSharpMethodType(MethodDescriptor method)
+    {
+        return IsViewOnlyMethod(method) ? "aelf::MethodType.View" : "aelf::MethodType.Action";
+    }
+
+    private static bool IsViewOnlyMethod(MethodDescriptor method)
+    {
+        return method.GetOptions().GetExtension(OptionsExtensions.IsView);
+    }
+
+
     /// <summary>
     ///     Generates instantiations for static readonly aelf::Method fields based on the proto
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L349
-    private static string GenerateStaticMethodField(MethodDescriptor methodDescriptor)
+    private static void GenerateStaticMethodField(IndentPrinter indentPrinter, MethodDescriptor methodDescriptor)
     {
-        throw new NotImplementedException();
+        var request = ProtoUtils.GetClassName(methodDescriptor.InputType);
+        var response = ProtoUtils.GetClassName(methodDescriptor.OutputType);
+        indentPrinter.Print(
+            $"static readonly aelf::Method<{request}, $response$> {GetMethodFieldName(methodDescriptor)} = new " +
+            $"aelf::Method<{request}, {response}>(");
+        indentPrinter.Indent();
+        indentPrinter.Indent();
+        indentPrinter.Print($"{GetCSharpMethodType(methodDescriptor)},");
+        indentPrinter.Print($"{GetServiceNameFieldName()},");
+        indentPrinter.Print($"\"{methodDescriptor.Name}\",");
+        indentPrinter.Print($"{GetMarshallerFieldName(methodDescriptor.InputType)},");
+        indentPrinter.Print($"{GetMarshallerFieldName(methodDescriptor.OutputType)});\n");
+        indentPrinter.Outdent();
+        indentPrinter.Outdent();
+    }
+
+    private static string GetStubClassName(ServiceDescriptor service)
+    {
+        return service.Name + "Stub";
     }
 
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L484
-    private static string GenerateStubClass(ServiceDescriptor serviceDescriptor)
+    private static void GenerateStubClass(IndentPrinter indentPrinter, ServiceDescriptor serviceDescriptor)
     {
-        throw new NotImplementedException();
+        indentPrinter.Print($"public class {GetStubClassName(serviceDescriptor)} : aelf::ContractStubBase");
+        indentPrinter.Print("{");
+        {
+            indentPrinter.Indent();
+            var methods = GetFullMethod(serviceDescriptor);
+            foreach (var method in methods)
+            {
+                indentPrinter.Print(
+                    $"public aelf::IMethodStub<{ProtoUtils.GetClassName(method.InputType)}, {ProtoUtils.GetClassName(method.OutputType)}> {method.Name}");
+                indentPrinter.Print("{");
+                {
+                    indentPrinter.Indent();
+                    indentPrinter.Print($"get {{ return __factory.Create({GetMethodFieldName(method)}); }}");
+                    indentPrinter.Outdent();
+                }
+                indentPrinter.Print("}\n");
+            }
+
+            indentPrinter.Outdent();
+        }
+        indentPrinter.Print("}");
     }
 
     /// <summary>
@@ -105,12 +154,63 @@ public class ContractContainerGenerator
     }
 
     /// <summary>
+    ///     GetMarshallerFieldName formats and returns a marshaller-fieldname based on the original C++ logic
+    ///     found here
+    ///     https://github.com/AElfProject/contract-plugin/blob/de625fcb79f83603e29d201c8488f101b40f573c/src/contract_csharp_generator.cc#L242
+    /// </summary>
+    private static string GetMarshallerFieldName(IDescriptor message)
+    {
+        var msgFullName = message.FullName;
+        return "__Marshaller_" + msgFullName.Replace(".", "_");
+    }
+
+    /// <summary>
+    ///     GetUsedMessages extracts messages from Proto ServiceDescriptor based on the original C++ logic
+    ///     found here
+    ///     https://github.com/AElfProject/contract-plugin/blob/de625fcb79f83603e29d201c8488f101b40f573c/src/contract_csharp_generator.cc#L312
+    /// </summary>
+    private static List<IDescriptor> GetUsedMessages(ServiceDescriptor service)
+    {
+        var descriptorSet = new HashSet<IDescriptor>();
+        var result = new List<IDescriptor>();
+
+        var methods = GetFullMethod(service);
+        foreach (var method in methods)
+        {
+            if (!descriptorSet.Contains(method.InputType))
+            {
+                descriptorSet.Add(method.InputType);
+                result.Add(method.InputType);
+            }
+
+            if (descriptorSet.Contains(method.OutputType)) continue;
+            descriptorSet.Add(method.OutputType);
+            result.Add(method.OutputType);
+        }
+
+        return result;
+    }
+
+
+    /// <summary>
     ///     Generates a section of instantiated aelf Marshallers as part of the contract
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L332
-    private static string GenerateMarshallerFields(ServiceDescriptor serviceDescriptor)
+    private static void GenerateMarshallerFields(IndentPrinter indentPrinter, ServiceDescriptor serviceDescriptor)
     {
-        throw new NotImplementedException();
+        indentPrinter.Print("#region Marshallers");
+        var usedMessages = GetUsedMessages(serviceDescriptor);
+        foreach (var usedMessage in usedMessages)
+        {
+            var type = ProtoUtils.GetClassName(usedMessage);
+            indentPrinter.Print(
+                $"static readonly aelf::Marshaller<{type}> {GetMarshallerFieldName(usedMessage)} = " +
+                "aelf::Marshallers.Create((arg) => " +
+                "global::Google.Protobuf.MessageExtensions.ToByteArray(arg), " +
+                $"{type}.Parser.ParseFrom);");
+        }
+
+        indentPrinter.Print("#endregion\n");
     }
 
     /// <summary>
@@ -144,6 +244,31 @@ public class ContractContainerGenerator
     {
         //TODO service null check
         return $"{service.Name}Container";
+    }
+
+    private static string GetMethodFieldName(MethodDescriptor method)
+    {
+        return "__Method_" + method.Name;
+    }
+
+    private static void GenerateBindServiceMethod(IndentPrinter indentPrinter, ServiceDescriptor service)
+    {
+        indentPrinter.Print(
+            $"public static aelf::ServerServiceDefinition BindService({GetServerClassName(service)} serviceImpl)");
+        indentPrinter.Print("{");
+        indentPrinter.Indent();
+        indentPrinter.Print("return aelf::ServerServiceDefinition.CreateBuilder()");
+        indentPrinter.Indent();
+        indentPrinter.Indent();
+        indentPrinter.Print(".AddDescriptors(Descriptors)");
+        var methods = GetFullMethod(service);
+        foreach (var method in methods)
+            indentPrinter.Print($".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name}).Build();");
+        indentPrinter.Outdent();
+        indentPrinter.Outdent();
+
+        indentPrinter.Outdent();
+        indentPrinter.Print("}\n");
     }
 
     //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L204
@@ -236,6 +361,18 @@ public class ContractContainerGenerator
         list.Add(service);
     }
 
+    private static void GenerateServiceDescriptorProperty(IndentPrinter indentPrinter,
+        ServiceDescriptor service)
+    {
+        indentPrinter.Print(
+            "public static global::Google.Protobuf.Reflection.ServiceDescriptor " +
+            "Descriptor");
+        indentPrinter.Print("{");
+        indentPrinter.Print(
+            $"  get {{ return {ProtoUtils.GetReflectionClassName(service.File)}.Descriptor.Services[{service.Index}]; }}");
+        indentPrinter.Print("}\n");
+    }
+
     //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L222
     private static List<MethodDescriptor> GetFullMethod(ServiceDescriptor service)
     {
@@ -243,13 +380,127 @@ public class ContractContainerGenerator
         return services.SelectMany(serviceItem => serviceItem.Methods).ToList();
     }
 
+    private static string GetServiceNameFieldName()
+    {
+        return "__ServiceName";
+    }
+
+    private static string GetReferenceClassName(ServiceDescriptor service)
+    {
+        return service.Name + "ReferenceState";
+    }
+
+    private static bool NeedContract(byte flags)
+    {
+        return (flags & FlagConstants.GenerateContract) != 0;
+    }
+
+    private static bool NeedStub(byte flags)
+    {
+        return (flags & FlagConstants.GenerateStub) != 0;
+    }
+
+    private static bool NeedReference(byte flags)
+    {
+        return (flags & FlagConstants.GenerateReference) != 0;
+    }
+
+    private static bool NeedContainer(byte flags)
+    {
+        return NeedContract(flags) | NeedStub(flags) | NeedReference(flags);
+    }
+
+    private static void GenerateReferenceClass(IndentPrinter indentPrinter, ServiceDescriptor service, byte flags)
+    {
+        // TODO: Maybe provide ContractReferenceState in options
+        indentPrinter.Print(
+            $"public class {GetReferenceClassName(service)} : global::AElf.Sdk.CSharp.State.ContractReferenceState");
+        indentPrinter.Print("{");
+        {
+            indentPrinter.Indent();
+            var methods = GetFullMethod(service);
+            foreach (var method in methods)
+                indentPrinter.Print(
+                    $"{ProtoUtils.GetAccessLevel(flags)} global::AElf.Sdk.CSharp.State.MethodReference<{ProtoUtils.GetClassName(method.InputType)}, {ProtoUtils.GetClassName(method.OutputType)}> {method.Name} {{ get; set; }}");
+            indentPrinter.Outdent();
+        }
+
+        indentPrinter.Print("}");
+    }
+
+    private static void GenerateAllServiceDescriptorsProperty(IndentPrinter indentPrinter,
+        ServiceDescriptor serviceDescriptor)
+    {
+        indentPrinter.Print(
+            "public static global::System.Collections.Generic.IReadOnlyList<global::Google.Protobuf.Reflection.ServiceDescriptor> Descriptors"
+        );
+        indentPrinter.Print("{");
+        {
+            indentPrinter.Indent();
+            indentPrinter.Print("get");
+            indentPrinter.Print("{");
+            {
+                indentPrinter.Indent();
+                indentPrinter.Print(
+                    "return new global::System.Collections.Generic.List<global::Google.Protobuf.Reflection.ServiceDescriptor>()");
+                indentPrinter.Print("{");
+                {
+                    indentPrinter.Indent();
+                    var services = GetFullService(serviceDescriptor);
+                    foreach (var service in services)
+                    {
+                        var index = service.Index.ToString();
+                        indentPrinter.Print(
+                            $"{ProtoUtils.GetReflectionClassName(service.File)}.Descriptor.Services[{index}],");
+                    }
+
+                    indentPrinter.Outdent();
+                }
+                indentPrinter.Print("};");
+                indentPrinter.Outdent();
+            }
+            indentPrinter.Print("}");
+            indentPrinter.Outdent();
+        }
+        indentPrinter.Print("}");
+    }
+
     /// <summary>
     ///     Generate will produce a chunk of C# code that serves as the container class of the AElf Contract.
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L612
-    public static string Generate(ServiceDescriptor serviceDescriptor, byte flags)
+    public static void Generate(IndentPrinter indentPrinter, ServiceDescriptor serviceDescriptor, byte flags)
     {
-        throw new NotImplementedException();
+        // GenerateDocCommentBody(serviceDescriptor,)
+        indentPrinter.Print(
+            $"{ProtoUtils.GetAccessLevel(flags)} static partial class {GetServiceContainerClassName(serviceDescriptor)}");
+        indentPrinter.Print("{");
+        indentPrinter.Indent();
+        indentPrinter.Print(
+            $"static readonly string {GetServiceNameFieldName()} = \"{serviceDescriptor.FullName}\";");
+
+        GenerateMarshallerFields(indentPrinter, serviceDescriptor);
+        indentPrinter.Print("#region Methods");
+        var methods = GetFullMethod(serviceDescriptor);
+        foreach (var method in methods) GenerateStaticMethodField(indentPrinter, method);
+        indentPrinter.Print("#endregion\n");
+
+        indentPrinter.Print("#region Descriptors");
+        GenerateServiceDescriptorProperty(indentPrinter, serviceDescriptor);
+        GenerateAllServiceDescriptorsProperty(indentPrinter, serviceDescriptor);
+        indentPrinter.Print("#endregion\n");
+
+        if (NeedContract(flags))
+        {
+            GenerateContractBaseClass(indentPrinter, serviceDescriptor);
+            GenerateBindServiceMethod(indentPrinter, serviceDescriptor);
+        }
+
+        if (NeedStub(flags)) GenerateStubClass(indentPrinter, serviceDescriptor);
+
+        if (NeedReference(flags)) GenerateReferenceClass(indentPrinter, serviceDescriptor, flags);
+        indentPrinter.Outdent();
+        indentPrinter.Print("}\n");
     }
 
     private enum MethodType
