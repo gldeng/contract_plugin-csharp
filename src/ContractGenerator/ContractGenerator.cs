@@ -80,11 +80,14 @@ public class ContractGenerator
         IReadOnlyList<FileDescriptor> fileDescriptors;
 
         using (stdin)
+        using (var memoryStream = new MemoryStream())
         {
-            request = Deserialize<CodeGeneratorRequest>(stdin);
+            stdin.CopyTo(memoryStream);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            request = Deserialize<CodeGeneratorRequest>(memoryStream);
             // need to rewind the stream before we can read again
-            stdin.Seek(0, SeekOrigin.Begin);
-            fileDescriptors = FileDescriptorSetLoader.Load(stdin);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            fileDescriptors = FileDescriptorSetLoader.Load(memoryStream);
         }
 
         var flags = FlagConstants.GenerateContractWithEvent;
