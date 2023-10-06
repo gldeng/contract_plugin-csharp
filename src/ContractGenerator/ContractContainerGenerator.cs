@@ -328,14 +328,6 @@ public class ContractContainerGenerator
         list.Add(service.File.Name);
     }
 
-    private class ServiceDescriptorComparer : IComparer<ServiceDescriptor>
-    {
-        public int Compare(ServiceDescriptor? x, ServiceDescriptor? y)
-        {
-            return string.Compare(x?.FullName,y?.FullName,StringComparison.Ordinal);
-        }
-    }
-
     private static void DepthFirstSearch(ServiceDescriptor service, ref List<ServiceDescriptor> list,
         ref SortedSet<ServiceDescriptor> seen)
     {
@@ -403,11 +395,6 @@ public class ContractContainerGenerator
     private static bool NeedReference(byte flags)
     {
         return (flags & FlagConstants.GenerateReference) != 0;
-    }
-
-    private static bool NeedContainer(byte flags)
-    {
-        return NeedContract(flags) | NeedStub(flags) | NeedReference(flags);
     }
 
     private static void GenerateReferenceClass(IndentPrinter indentPrinter, ServiceDescriptor service, byte flags)
@@ -501,6 +488,14 @@ public class ContractContainerGenerator
         if (NeedReference(flags)) GenerateReferenceClass(indentPrinter, serviceDescriptor, flags);
         indentPrinter.Outdent();
         indentPrinter.Print("}\n");
+    }
+
+    private class ServiceDescriptorComparer : IComparer<ServiceDescriptor>
+    {
+        public int Compare(ServiceDescriptor? x, ServiceDescriptor? y)
+        {
+            return string.Compare(x?.FullName, y?.FullName, StringComparison.Ordinal);
+        }
     }
 
     private enum MethodType

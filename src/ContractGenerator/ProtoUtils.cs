@@ -116,11 +116,38 @@ public class ProtoUtils
     ///     Extract the C# Namespace for the target contract based on the Proto data.
     /// </summary>
     //TODO Implementation https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L66
-    private static string GetFileNamespace(FileDescriptor fileDescriptor)
+    public static string GetFileNamespace(FileDescriptor fileDescriptor)
     {
         return fileDescriptor.GetOptions().HasCsharpNamespace
             ? fileDescriptor.GetOptions().CsharpNamespace
             : UnderscoresToCamelCase(fileDescriptor.Package, true, true);
+    }
+
+    /// <summary>
+    ///     Proto Util method based off the C++ original
+    ///     https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/compiler/code_generator.cc#L97
+    /// </summary>
+    public static void ParseGeneratorParameter(string text, List<Tuple<string, string>> output)
+    {
+        var parts = text.Split(',');
+        foreach (var part in parts)
+        {
+            var equalsPos = part.IndexOf('=');
+            string key, value;
+
+            if (equalsPos == -1)
+            {
+                key = part;
+                value = string.Empty;
+            }
+            else
+            {
+                key = part[..equalsPos];
+                value = part[(equalsPos + 1)..];
+            }
+
+            output.Add(Tuple.Create(key, value));
+        }
     }
 
     /// <summary>

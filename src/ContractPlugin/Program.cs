@@ -14,8 +14,7 @@ internal class Program
 
         var stream = Console.OpenStandardInput();
 
-        var contractGenerator = new ContractGenerator.ContractGenerator();
-        var response = contractGenerator.Generate(stream);
+        var response = ContractGenerator.ContractGenerator.Generate(stream);
 
         // set result to standard output
         using var stdout = Console.OpenStandardOutput();
