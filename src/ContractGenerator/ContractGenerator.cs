@@ -77,16 +77,16 @@ public class ContractGenerator
     {
         var response = new CodeGeneratorResponse();
         CodeGeneratorRequest request;
-        FileDescriptorSet descriptorSet;
+        IReadOnlyList<FileDescriptor> fileDescriptors;
 
         using (stdin)
         {
             request = Deserialize<CodeGeneratorRequest>(stdin);
-            descriptorSet = FileDescriptorSet.Parser.ParseFrom(stdin);
+            // need to rewind the stream before we can read again
+            stdin.Seek(0, SeekOrigin.Begin);
+            fileDescriptors = FileDescriptorSetLoader.Load(stdin);
         }
 
-        var byteStrings = descriptorSet.File.Select(f => f.ToByteString()).ToList();
-        var fileDescriptors = FileDescriptor.BuildFromByteStrings(byteStrings);
         var flags = FlagConstants.GenerateContractWithEvent;
         var options = new List<Tuple<string, string>>();
         ProtoUtils.ParseGeneratorParameter(request.Parameter, options);
@@ -112,13 +112,16 @@ public class ContractGenerator
                     flags |= FlagConstants.InternalAccess;
                     break;
                 default:
-                    throw new Exception("Unknown generator option: " + option);
+                    Console.WriteLine("Unknown generator option: " + option);
+                    break;
             }
 
         foreach (var file in fileDescriptors)
         {
             var generatedCsCodeBody = GetServices(file, flags);
-            if (generatedCsCodeBody.Length == 0) return response; // don't generate a file if there are no services
+            if (generatedCsCodeBody.Length == 0)
+                // don't generate a file if there are no services
+                continue;
 
             // Get output file name.
             var fileName = ServicesFilename(file);
