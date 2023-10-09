@@ -30,9 +30,7 @@ internal class Program
             // need to rewind the stream before we can read again
             memoryStream.Seek(0, SeekOrigin.Begin);
             // request.ProtoFile;
-            var s = new FileDescriptorSet();
-            s.File.AddRange(request.ProtoFile);
-            fileDescriptors = FileDescriptorSetLoader.Load(s.File);
+            fileDescriptors = FileDescriptorSetLoader.Load(request.ProtoFile);
         }
 
         var options = new List<Tuple<string, string>>();
