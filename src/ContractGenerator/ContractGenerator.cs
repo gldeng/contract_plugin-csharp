@@ -1,5 +1,4 @@
 using System.Text;
-using Google.Protobuf;
 using Google.Protobuf.Compiler;
 using Google.Protobuf.Reflection;
 
@@ -73,26 +72,12 @@ public class ContractGenerator
     ///     Generates a set of C# files from the input stream containing the proto source. This is the primary entry-point into
     ///     the ContractPlugin.
     /// </summary>
-    public static CodeGeneratorResponse Generate(Stream stdin)
+    public static CodeGeneratorResponse Generate(IEnumerable<FileDescriptor> fileDescriptors,
+        List<Tuple<string, string>> options)
     {
         var response = new CodeGeneratorResponse();
-        CodeGeneratorRequest request;
-        IReadOnlyList<FileDescriptor> fileDescriptors;
-
-        using (stdin)
-        using (var memoryStream = new MemoryStream())
-        {
-            stdin.CopyTo(memoryStream);
-            memoryStream.Seek(0, SeekOrigin.Begin);
-            request = Deserialize<CodeGeneratorRequest>(memoryStream);
-            // need to rewind the stream before we can read again
-            memoryStream.Seek(0, SeekOrigin.Begin);
-            fileDescriptors = FileDescriptorSetLoader.Load(memoryStream);
-        }
 
         var flags = FlagConstants.GenerateContractWithEvent;
-        var options = new List<Tuple<string, string>>();
-        ProtoUtils.ParseGeneratorParameter(request.Parameter, options);
         foreach (var option in options)
             switch (option.Item1)
             {
@@ -251,10 +236,5 @@ public class ContractGenerator
 
         indentPrinter.Print("#endregion\n");
         return indentPrinter.PrintOut();
-    }
-
-    private static T Deserialize<T>(Stream stream) where T : IMessage<T>, new()
-    {
-        return new MessageParser<T>(() => new T()).ParseFrom(stream);
     }
 }

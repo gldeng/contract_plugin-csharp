@@ -11,7 +11,9 @@ public class ContractGeneratorTests
     public void TestGenerate_NoErrors()
     {
         var stdin = GetInputStream("helloworld");
-        var response = ContractGenerator.Generate(stdin);
+        var fileDescriptors = FileDescriptorSetLoader.Load(stdin);
+        var options = new List<Tuple<string, string>> { new("", "") };
+        var response = ContractGenerator.Generate(fileDescriptors, options);
 
         Assert.Single(response.File);
         Assert.Equal("Contract.c.cs", response.File[0].Name);
