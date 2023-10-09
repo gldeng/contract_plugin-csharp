@@ -21,7 +21,12 @@ public static class FileDescriptorSetLoader
     public static IReadOnlyList<FileDescriptor> Load(Stream stream)
     {
         var fds = FileDescriptorSet.Parser.WithExtensionRegistry(_extensionRegistry).ParseFrom(stream);
-        var fileInByteStrings = fds.File.Select(f => f.ToByteString());
+        return Load(fds.File);
+    }
+
+    public static IReadOnlyList<FileDescriptor> Load(IEnumerable<FileDescriptorProto> protos)
+    {
+        var fileInByteStrings = protos.Select(f => f.ToByteString());
         return FileDescriptor.BuildFromByteStrings(fileInByteStrings, _extensionRegistry);
     }
 }
