@@ -4,6 +4,36 @@ namespace ContractPlugin;
 
 public static class ParameterParser
 {
+    /// <summary>
+    ///     Proto Util method based off the C++ original
+    ///     https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/compiler/code_generator.cc#L97
+    /// </summary>
+    internal static List<KeyValuePair<string, string>> ParseGeneratorParameter(string text)
+    {
+        var output = new List<KeyValuePair<string, string>>();
+        var parts = text.Split(',');
+        foreach (var part in parts)
+        {
+            var equalsPos = part.IndexOf('=');
+            string key, value;
+
+            if (equalsPos == -1)
+            {
+                key = part;
+                value = string.Empty;
+            }
+            else
+            {
+                key = part[..equalsPos];
+                value = part[(equalsPos + 1)..];
+            }
+
+            output.Add(KeyValuePair.Create(key, value));
+        }
+
+        return output;
+    }
+
     internal static GeneratorOptions Parse(string parameter)
     {
         var options = new GeneratorOptions()
@@ -11,8 +41,9 @@ public static class ParameterParser
             GenerateEvent = true,
             GenerateContract = true
         };
-        var pairs = new List<Tuple<string, string>>();
-        if (parameter != "") ProtoUtils.ParseGeneratorParameter(parameter, pairs);
+        var pairs = new List<KeyValuePair<string, string>>();
+        if (parameter != "")
+            pairs = ParseGeneratorParameter(parameter);
         foreach (var (key, _) in pairs)
             switch (key)
             {

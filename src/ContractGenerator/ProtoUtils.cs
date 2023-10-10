@@ -124,33 +124,6 @@ public class ProtoUtils
     }
 
     /// <summary>
-    ///     Proto Util method based off the C++ original
-    ///     https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/compiler/code_generator.cc#L97
-    /// </summary>
-    public static void ParseGeneratorParameter(string text, List<Tuple<string, string>> output)
-    {
-        var parts = text.Split(',');
-        foreach (var part in parts)
-        {
-            var equalsPos = part.IndexOf('=');
-            string key, value;
-
-            if (equalsPos == -1)
-            {
-                key = part;
-                value = string.Empty;
-            }
-            else
-            {
-                key = part[..equalsPos];
-                value = part[(equalsPos + 1)..];
-            }
-
-            output.Add(Tuple.Create(key, value));
-        }
-    }
-
-    /// <summary>
     ///     This Util does more than just convert underscores to camel-case. copied from the C++ original
     ///     https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L138
     /// </summary>
