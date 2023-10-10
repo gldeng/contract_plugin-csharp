@@ -1,7 +1,6 @@
 using ContractGenerator;
 using Google.Protobuf;
 using Google.Protobuf.Compiler;
-using Google.Protobuf.Reflection;
 
 namespace ContractPlugin;
 
@@ -20,8 +19,7 @@ internal class Program
         var request = CodeGeneratorRequest.Parser.ParseFrom(stream);
         var fileDescriptors = FileDescriptorSetLoader.Load(request.ProtoFile);
 
-        var options = new List<Tuple<string, string>>();
-        if (request.Parameter != "") ProtoUtils.ParseGeneratorParameter(request.Parameter, options);
+        var options = ParameterParser.Parse(request.Parameter);
         var response = ContractGenerator.ContractGenerator.Generate(fileDescriptors, options);
 
         // set result to standard output

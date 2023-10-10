@@ -41,9 +41,9 @@ public class ProtoUtils
 
 
     // Implementation follows C++ original https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
-    public static string GetAccessLevel(byte flags)
+    public static string GetAccessLevel(GeneratorOptions options)
     {
-        return (flags & FlagConstants.InternalAccess) != 0 ? "internal" : "public";
+        return options.InternalAccess ? "internal" : "public";
     }
 
     private static string ToCSharpName(string name, FileDescriptor fileDescriptor)
@@ -121,33 +121,6 @@ public class ProtoUtils
         return fileDescriptor.GetOptions().HasCsharpNamespace
             ? fileDescriptor.GetOptions().CsharpNamespace
             : UnderscoresToCamelCase(fileDescriptor.Package, true, true);
-    }
-
-    /// <summary>
-    ///     Proto Util method based off the C++ original
-    ///     https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/compiler/code_generator.cc#L97
-    /// </summary>
-    public static void ParseGeneratorParameter(string text, List<Tuple<string, string>> output)
-    {
-        var parts = text.Split(',');
-        foreach (var part in parts)
-        {
-            var equalsPos = part.IndexOf('=');
-            string key, value;
-
-            if (equalsPos == -1)
-            {
-                key = part;
-                value = string.Empty;
-            }
-            else
-            {
-                key = part[..equalsPos];
-                value = part[(equalsPos + 1)..];
-            }
-
-            output.Add(Tuple.Create(key, value));
-        }
     }
 
     /// <summary>

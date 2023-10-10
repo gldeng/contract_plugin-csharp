@@ -13,7 +13,11 @@ public class ContractGeneratorTests
         var stdin = GetInputStream("helloworld");
         var fileDescriptors = FileDescriptorSetLoader.Load(stdin);
         var options = new List<Tuple<string, string>> { new("", "") };
-        var response = ContractGenerator.Generate(fileDescriptors, options);
+        var response = ContractGenerator.Generate(fileDescriptors, new GeneratorOptions
+        {
+            GenerateContract = true,
+            GenerateEvent = true
+        });
 
         Assert.Single(response.File);
         Assert.Equal("Contract.c.cs", response.File[0].Name);
