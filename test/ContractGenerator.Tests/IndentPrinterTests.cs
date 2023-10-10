@@ -7,7 +7,7 @@ public class IndentPrinterTests
     {
         var indentPrinter = new IndentPrinter();
         indentPrinter.Indent();
-        indentPrinter.Print("test func()");
+        indentPrinter.PrintLine("test func()");
         var outputCode = indentPrinter.PrintOut();
         Assert.Equal("  test func()\n", outputCode);
     }
@@ -17,13 +17,13 @@ public class IndentPrinterTests
     {
         var indentPrinter = new IndentPrinter();
         indentPrinter.Indent();
-        indentPrinter.Print("test func(){");
+        indentPrinter.PrintLine("test func(){");
         indentPrinter.Indent();
-        indentPrinter.Print("var someFields = new SomeField();");
+        indentPrinter.PrintLine("var someFields = new SomeField();");
         indentPrinter.Outdent();
-        indentPrinter.Print("}");
+        indentPrinter.PrintLine("}");
         indentPrinter.Outdent();
-        indentPrinter.Print("//done");
+        indentPrinter.PrintLine("//done");
         var outputCode = indentPrinter.PrintOut();
         Assert.Equal("  test func(){\n    var someFields = new SomeField();\n  }\n//done\n", outputCode);
     }
@@ -34,7 +34,7 @@ public class IndentPrinterTests
         // Arrange: Set up your test scenario
         var indentPrinter = new IndentPrinter();
         indentPrinter.Indent();
-        indentPrinter.Print("test func()");
+        indentPrinter.PrintLine("test func()");
         indentPrinter.Outdent();
         var action = () => indentPrinter.Outdent();
         // Act & Assert: Use Assert.Throws to assert that an exception is thrown
