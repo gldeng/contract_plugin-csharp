@@ -35,8 +35,7 @@ using System.Collections.Generic;
 using aelf = global::AElf.CSharp.Core;
 
 namespace AElf.Contracts.HelloWorld {
-
-#region Events
+  #region Events
   public partial class UpdatedMessage : aelf::IEvent<UpdatedMessage>
   {
     public global::System.Collections.Generic.IEnumerable<UpdatedMessage> GetIndexed()

@@ -150,7 +150,7 @@ public class ContractGenerator
         if (options.GenerateEvent)
         {
             // Events are not needed for contract reference
-            indentPrinter.Print("\n#region Events");
+            indentPrinter.Print("#region Events");
             foreach (var msg in file.MessageTypes) EventTypeGenerator.GenerateEvent(indentPrinter, msg, options);
             indentPrinter.Print("#endregion\n");
         }
