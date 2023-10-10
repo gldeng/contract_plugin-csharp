@@ -20,22 +20,13 @@ internal class Program
         CodeGeneratorRequest request;
 
         using (stream)
-        using (var memoryStream = new MemoryStream())
         {
-            stream.CopyTo(memoryStream);
-            memoryStream.Seek(0, SeekOrigin.Begin);
-            //Unfortunately FileDescriptor's proto doesnt have the CLI Parameters equivalent of https://github.com/protocolbuffers/protobuf/blob/main/csharp/src/Google.Protobuf/Compiler/Plugin.pb.cs#L502
-            //So we need to parse request to get these params
-            request = Deserialize<CodeGeneratorRequest>(memoryStream);
-            // need to rewind the stream before we can read again
-            memoryStream.Seek(0, SeekOrigin.Begin);
-            // request.ProtoFile;
+            request = Deserialize<CodeGeneratorRequest>(stream);
             fileDescriptors = FileDescriptorSetLoader.Load(request.ProtoFile);
         }
 
         var options = new List<Tuple<string, string>>();
-        Console.WriteLine("params:" + request.Parameter);
-        ProtoUtils.ParseGeneratorParameter(request.Parameter, options);
+        if (request.Parameter != "") ProtoUtils.ParseGeneratorParameter(request.Parameter, options);
         var response = ContractGenerator.ContractGenerator.Generate(fileDescriptors, options);
 
         // set result to standard output

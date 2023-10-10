@@ -99,9 +99,10 @@ public class ContractGenerator
                 case "internal_access":
                     flags |= FlagConstants.InternalAccess;
                     break;
-                default:
-                    Console.WriteLine("Unknown generator option: " + option);
+                case "":
                     break;
+                default:
+                    throw new Exception("Unknown generator option: " + option);
             }
 
         foreach (var file in fileDescriptors)
