@@ -4,7 +4,7 @@ public class ContractGeneratorTests
 {
     private static FileStream GetInputStream(string testcaseName)
     {
-        return File.Open($"testcases/{testcaseName}/descriptor.bin", FileMode.Open);
+        return File.Open($"testcases/{testcaseName}/descriptor.bin", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
 
     [Fact]
