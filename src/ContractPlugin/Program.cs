@@ -29,7 +29,8 @@ internal class Program
             request = Deserialize<CodeGeneratorRequest>(memoryStream);
             // need to rewind the stream before we can read again
             memoryStream.Seek(0, SeekOrigin.Begin);
-            fileDescriptors = FileDescriptorSetLoader.Load(memoryStream);
+            // request.ProtoFile;
+            fileDescriptors = FileDescriptorSetLoader.Load(request.ProtoFile);
         }
 
         var options = new List<Tuple<string, string>>();
