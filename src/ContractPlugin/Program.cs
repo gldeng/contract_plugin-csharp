@@ -15,15 +15,10 @@ internal class Program
         // you can attach debugger
         // System.Diagnostics.Debugger.Launch();
 
-        var stream = Console.OpenStandardInput();
-        IReadOnlyList<FileDescriptor> fileDescriptors;
-        CodeGeneratorRequest request;
+        using var stream = Console.OpenStandardInput();
 
-        using (stream)
-        {
-            request = Deserialize<CodeGeneratorRequest>(stream);
-            fileDescriptors = FileDescriptorSetLoader.Load(request.ProtoFile);
-        }
+        var request = CodeGeneratorRequest.Parser.ParseFrom(stream);
+        var fileDescriptors = FileDescriptorSetLoader.Load(request.ProtoFile);
 
         var options = new List<Tuple<string, string>>();
         if (request.Parameter != "") ProtoUtils.ParseGeneratorParameter(request.Parameter, options);
@@ -32,10 +27,5 @@ internal class Program
         // set result to standard output
         using var stdout = Console.OpenStandardOutput();
         response.WriteTo(stdout);
-    }
-
-    private static T Deserialize<T>(Stream stream) where T : IMessage<T>, new()
-    {
-        return new MessageParser<T>(() => new T()).ParseFrom(stream);
     }
 }
