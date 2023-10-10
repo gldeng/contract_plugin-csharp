@@ -143,7 +143,7 @@ public class ContractGenerator
         var fileNameSpace = ProtoUtils.GetFileNamespace(file);
         if (fileNameSpace != "")
         {
-            indentPrinter.Print($"namespace {fileNameSpace} {{");
+            indentPrinter.Print($"namespace {fileNameSpace} {{\n");
             indentPrinter.Indent();
         }
 
