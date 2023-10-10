@@ -9,11 +9,16 @@ public class ContractContainerGeneratorTests : TestBase
         var fileDescriptors = GetFileDescriptors("helloworld");
         var svc = fileDescriptors[^1].Services.Last();
 
-        var flags = FlagConstants.GenerateContractWithEvent;
-        flags |= FlagConstants.GenerateStubWithEvent;
-        flags &= FlagConstants.GenerateContract;
+        var options = new GeneratorOptions
+        {
+            GenerateContract = true,
+            GenerateEvent = true
+        };
+        // var flags = FlagConstants.GenerateContractWithEvent;
+        // flags |= FlagConstants.GenerateStubWithEvent;
+        // flags &= FlagConstants.GenerateContract;
 
-        ContractContainerGenerator.Generate(indentPrinter, svc, flags);
+        ContractContainerGenerator.Generate(indentPrinter, svc, options);
         var contractContainerCodeStr = indentPrinter.PrintOut();
         const string expectedContainerCodeStr = @"public static partial class HelloWorldContainer
 {

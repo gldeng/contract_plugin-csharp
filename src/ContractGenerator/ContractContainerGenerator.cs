@@ -382,22 +382,7 @@ public class ContractContainerGenerator
         return service.Name + "ReferenceState";
     }
 
-    private static bool NeedContract(byte flags)
-    {
-        return (flags & FlagConstants.GenerateContract) != 0;
-    }
-
-    private static bool NeedStub(byte flags)
-    {
-        return (flags & FlagConstants.GenerateStub) != 0;
-    }
-
-    private static bool NeedReference(byte flags)
-    {
-        return (flags & FlagConstants.GenerateReference) != 0;
-    }
-
-    private static void GenerateReferenceClass(IndentPrinter indentPrinter, ServiceDescriptor service, byte flags)
+    private static void GenerateReferenceClass(IndentPrinter indentPrinter, ServiceDescriptor service, GeneratorOptions options)
     {
         // TODO: Maybe provide ContractReferenceState in options
         indentPrinter.Print(
@@ -408,7 +393,7 @@ public class ContractContainerGenerator
             var methods = GetFullMethod(service);
             foreach (var method in methods)
                 indentPrinter.Print(
-                    $"{ProtoUtils.GetAccessLevel(flags)} global::AElf.Sdk.CSharp.State.MethodReference<{ProtoUtils.GetClassName(method.InputType)}, {ProtoUtils.GetClassName(method.OutputType)}> {method.Name} {{ get; set; }}");
+                    $"{ProtoUtils.GetAccessLevel(options)} global::AElf.Sdk.CSharp.State.MethodReference<{ProtoUtils.GetClassName(method.InputType)}, {ProtoUtils.GetClassName(method.OutputType)}> {method.Name} {{ get; set; }}");
             indentPrinter.Outdent();
         }
 
@@ -456,11 +441,12 @@ public class ContractContainerGenerator
     ///     Generate will produce a chunk of C# code that serves as the container class of the AElf Contract.
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L612
-    public static void Generate(IndentPrinter indentPrinter, ServiceDescriptor serviceDescriptor, byte flags)
+    public static void Generate(IndentPrinter indentPrinter, ServiceDescriptor serviceDescriptor,
+        GeneratorOptions options)
     {
         // GenerateDocCommentBody(serviceDescriptor,)
         indentPrinter.Print(
-            $"{ProtoUtils.GetAccessLevel(flags)} static partial class {GetServiceContainerClassName(serviceDescriptor)}");
+            $"{ProtoUtils.GetAccessLevel(options)} static partial class {GetServiceContainerClassName(serviceDescriptor)}");
         indentPrinter.Print("{");
         indentPrinter.Indent();
         indentPrinter.Print(
@@ -477,15 +463,15 @@ public class ContractContainerGenerator
         GenerateAllServiceDescriptorsProperty(indentPrinter, serviceDescriptor);
         indentPrinter.Print("#endregion\n");
 
-        if (NeedContract(flags))
+        if (options.GenerateContract)
         {
             GenerateContractBaseClass(indentPrinter, serviceDescriptor);
             GenerateBindServiceMethod(indentPrinter, serviceDescriptor);
         }
 
-        if (NeedStub(flags)) GenerateStubClass(indentPrinter, serviceDescriptor);
+        if (options.GenerateStub) GenerateStubClass(indentPrinter, serviceDescriptor);
 
-        if (NeedReference(flags)) GenerateReferenceClass(indentPrinter, serviceDescriptor, flags);
+        if (options.GenerateReference) GenerateReferenceClass(indentPrinter, serviceDescriptor, options);
         indentPrinter.Outdent();
         indentPrinter.Print("}\n");
     }

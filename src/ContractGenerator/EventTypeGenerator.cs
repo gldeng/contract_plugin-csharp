@@ -5,11 +5,11 @@ namespace ContractGenerator;
 
 public static class EventTypeGenerator
 {
-    public static void GenerateEvent(IndentPrinter printer, MessageDescriptor message, byte flags)
+    public static void GenerateEvent(IndentPrinter printer, MessageDescriptor message, GeneratorOptions options)
     {
         if (!IsEventMessageType(message)) return;
         printer.Print(
-            $"{ProtoUtils.GetAccessLevel(flags)} partial class {message.Name} : aelf::IEvent<{message.Name}>");
+            $"{ProtoUtils.GetAccessLevel(options)} partial class {message.Name} : aelf::IEvent<{message.Name}>");
         printer.Print("{");
         {
             printer.Indent();
