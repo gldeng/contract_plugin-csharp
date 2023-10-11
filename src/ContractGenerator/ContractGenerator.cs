@@ -159,7 +159,7 @@ public class ContractGenerator
             indentPrinter.PrintLine();
         }
 
-        if (options.RequireContainer)
+        if (options.GenerateContainer)
             foreach (var svc in file.Services)
                 ContractContainerGenerator.Generate(indentPrinter, svc, options);
 

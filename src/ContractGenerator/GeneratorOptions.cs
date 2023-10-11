@@ -44,5 +44,5 @@ public class GeneratorOptions
     public bool GenerateEvent { get; set; }
 
     public bool GenerateEventOnly => GenerateEvent & !GenerateContract & !GenerateReference & !GenerateStub;
-    public bool RequireContainer => GenerateContract | GenerateReference | GenerateStub;
+    public bool GenerateContainer => GenerateContract | GenerateReference | GenerateStub;
 }
