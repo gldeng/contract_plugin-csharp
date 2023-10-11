@@ -28,7 +28,7 @@ public class ProtoUtilsTests
     [InlineData("foo_bar.baz", "FooBar.Baz")]
     public void Test_UnderscoresToCamelCase_CapNextLetter_And_PreservingPeriod(string input, string output)
     {
-        var o = ProtoUtils.UnderscoresToCamelCase(input, true, true);
+        var o = input.UnderscoresToCamelCase(true, true);
         Assert.Equal(output, o);
     }
 
@@ -36,7 +36,7 @@ public class ProtoUtilsTests
     [InlineData("foo_bar.baz", "FooBarBaz")]
     public void Test_UnderscoresToCamelCase_CapNextLetter_And_NotPreservingPeriod(string input, string output)
     {
-        var o = ProtoUtils.UnderscoresToCamelCase(input, true);
+        var o = input.UnderscoresToCamelCase(true);
         Assert.Equal(output, o);
     }
 
@@ -44,7 +44,7 @@ public class ProtoUtilsTests
     [InlineData("foo_bar.baz", "FooBarBaz")]
     public void Test_UnderscoresToPascalCase_CapNextLetter_And_NotPreservingPeriod(string input, string output)
     {
-        var o = ProtoUtils.UnderscoresToPascalCase(input);
+        var o = input.UnderscoresToPascalCase();
         Assert.Equal(output, o);
     }
 
@@ -86,7 +86,7 @@ public class ProtoUtilsTests
         {
             Assert.NotNull(field);
             // Act: Call the GetPropertyName method
-            var propertyName = ProtoUtils.GetPropertyName(field);
+            var propertyName = field.GetPropertyName();
 
             // Assert: Verify the expected result
             Assert.Equal("Value", propertyName);

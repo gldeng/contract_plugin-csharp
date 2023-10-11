@@ -18,14 +18,6 @@ public class EventTypeGenerator : GeneratorBase
     #region Helper Methods
 
     /// <summary>
-    ///     Determines if the proto-message is of IndexedType based on Aelf.options
-    /// </summary>
-    private static bool IsIndexedField(FieldDescriptor field)
-    {
-        return field.GetOptions() != null && field.GetOptions().GetExtension(OptionsExtensions.IsIndexed);
-    }
-
-    /// <summary>
     ///     Determines if the proto-message is of EventType based on Aelf.options
     /// </summary>
     public static bool IsEventMessageType(MessageDescriptor message)
@@ -51,14 +43,12 @@ public class EventTypeGenerator : GeneratorBase
                     InBlockWithSemicolon(() =>
                     {
                         var fields = _messageDescriptor.Fields.InFieldNumberOrder();
-                        foreach (var field in fields)
+                        foreach (var field in fields.Where(f => f.IndexedField()))
                         {
-                            if (field == null) continue;
-                            if (!IsIndexedField(field)) continue;
                             indentPrinter.PrintLine($"new {_messageDescriptor.Name}");
                             InBlockWithComma(() =>
                             {
-                                var propertyName = ProtoUtils.GetPropertyName(field);
+                                var propertyName = field.GetPropertyName();
                                 indentPrinter.PrintLine($"{propertyName} = {propertyName}");
                             });
                         }
@@ -74,11 +64,9 @@ public class EventTypeGenerator : GeneratorBase
                     InBlockWithSemicolon(() =>
                     {
                         var fields = _messageDescriptor.Fields.InFieldNumberOrder();
-                        foreach (var field in fields)
+                        foreach (var field in fields.Where(f => f.NonIndexedField()))
                         {
-                            if (field == null) continue;
-                            if (IsIndexedField(field)) continue;
-                            var propertyName = ProtoUtils.GetPropertyName(field);
+                            var propertyName = field.GetPropertyName();
                             indentPrinter.PrintLine($"{propertyName} = {propertyName},");
                         }
                     });
