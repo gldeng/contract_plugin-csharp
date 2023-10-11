@@ -5,7 +5,6 @@ public class ContractContainerGeneratorTests : TestBase
     [Fact]
     public void TestGenerateContainer_NoErrors()
     {
-        var indentPrinter = new IndentPrinter();
         var fileDescriptors = GetFileDescriptors("helloworld");
         var svc = fileDescriptors[^1].Services.Last();
 
@@ -18,7 +17,8 @@ public class ContractContainerGeneratorTests : TestBase
         // flags |= FlagConstants.GenerateStubWithEvent;
         // flags &= FlagConstants.GenerateContract;
 
-        new Generator(svc, options, indentPrinter).Generate();
+        var indentPrinter = new Generator(svc, options);
+        indentPrinter.Generate();
         var contractContainerCodeStr = indentPrinter.PrintOut();
         const string expectedContainerCodeStr =
             """
@@ -89,11 +89,11 @@ public class ContractContainerGeneratorTests : TestBase
     [Fact]
     public void TestGenerateContractBaseClass_NoErrors()
     {
-        var indentPrinter = new IndentPrinter();
         var fileDescriptors = GetFileDescriptors("contract_with_bases");
         var svc = fileDescriptors[^1].Services.Last();
 
-        new Generator(svc, new GeneratorOptions(), indentPrinter).GenerateContractBaseClass();
+        var indentPrinter = new Generator(svc, new GeneratorOptions());
+        indentPrinter.GenerateContractBaseClass();
         var contractBaseCodeStr = indentPrinter.PrintOut();
         const string expectedCodeStr =
             """

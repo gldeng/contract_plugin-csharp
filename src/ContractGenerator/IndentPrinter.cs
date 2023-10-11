@@ -24,6 +24,18 @@ public class IndentPrinter
         PrintLine(String.Empty);
     }
 
+    public void Print(string str)
+    {
+        if (string.IsNullOrEmpty(str)) return;
+        var lines = str.Split(Environment.NewLine);
+        foreach (var line in lines.SkipLast(1))
+        {
+            PrintOneLine(line);
+        }
+
+        _stringBuilder.Append(lines.Last());
+    }
+
     public void PrintLine(string str)
     {
         var lines = str.Split(Environment.NewLine);

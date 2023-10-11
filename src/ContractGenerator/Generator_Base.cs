@@ -12,15 +12,15 @@ public partial class Generator
     protected internal void GenerateContractBaseClass()
     {
         var serverClassName = GetServerClassName();
-        indentPrinter.PrintLine(
+        PrintLine(
             $"/// <summary>Base class for the contract of {serverClassName}</summary>");
-        indentPrinter.PrintLine(
+        PrintLine(
             $"public abstract partial class {serverClassName} : AElf.Sdk.CSharp.CSharpSmartContract<{GetStateTypeName()}>");
         InBlock(() =>
         {
             var methods = GetFullMethod();
             foreach (var method in methods)
-                indentPrinter.PrintLine(
+                PrintLine(
                     $"public abstract {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)});");
         });
     }
@@ -79,21 +79,21 @@ public partial class Generator
 
     private void GenerateBindServiceMethod()
     {
-        indentPrinter.PrintLine(
+        PrintLine(
             $"public static aelf::ServerServiceDefinition BindService({GetServerClassName()} serviceImpl)");
         InBlock(() =>
         {
-            indentPrinter.PrintLine("return aelf::ServerServiceDefinition.CreateBuilder()");
-            indentPrinter.Indent();
-            indentPrinter.Indent();
-            indentPrinter.PrintLine(".AddDescriptors(Descriptors)");
+            PrintLine("return aelf::ServerServiceDefinition.CreateBuilder()");
+            Indent();
+            Indent();
+            PrintLine(".AddDescriptors(Descriptors)");
             var methods = GetFullMethod();
             foreach (var method in methods)
-                indentPrinter.PrintLine(
+                PrintLine(
                     $".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name}).Build();");
-            indentPrinter.Outdent();
-            indentPrinter.Outdent();
+            Outdent();
+            Outdent();
         });
-        indentPrinter.PrintLine();
+        PrintLine();
     }
 }

@@ -155,14 +155,17 @@ public class ContractGenerator
             // Events are not needed for contract reference
             indentPrinter.PrintLine();
             indentPrinter.PrintLine("#region Events");
-            foreach (var msg in file.MessageTypes) new EventTypeGenerator(msg, options, indentPrinter).Generate();
+            foreach (var msg in file.MessageTypes)
+                indentPrinter.Print(new EventTypeGenerator(msg, options).Generate() ?? "");
             indentPrinter.PrintLine("#endregion");
             indentPrinter.PrintLine();
         }
 
         if (options.GenerateContainer)
             foreach (var svc in file.Services)
-                new Generator(svc, options, indentPrinter).Generate();
+            {
+                indentPrinter.Print(new Generator(svc, options).Generate() ?? "");
+            }
 
         if (fileNameSpace != "")
         {

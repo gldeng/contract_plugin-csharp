@@ -5,28 +5,28 @@ public partial class Generator
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L484
     private void GenerateStubClass()
     {
-        indentPrinter.PrintLine($"public class {GetStubClassName()} : aelf::ContractStubBase");
-        indentPrinter.PrintLine("{");
+        PrintLine($"public class {GetStubClassName()} : aelf::ContractStubBase");
+        PrintLine("{");
         {
-            indentPrinter.Indent();
+            Indent();
             var methods = GetFullMethod();
             foreach (var method in methods)
             {
-                indentPrinter.PrintLine(
+                PrintLine(
                     $"public aelf::IMethodStub<{ProtoUtils.GetClassName(method.InputType)}, {ProtoUtils.GetClassName(method.OutputType)}> {method.Name}");
-                indentPrinter.PrintLine("{");
+                PrintLine("{");
                 {
-                    indentPrinter.Indent();
-                    indentPrinter.PrintLine($"get {{ return __factory.Create({GetMethodFieldName(method)}); }}");
-                    indentPrinter.Outdent();
+                    Indent();
+                    PrintLine($"get {{ return __factory.Create({GetMethodFieldName(method)}); }}");
+                    Outdent();
                 }
-                indentPrinter.PrintLine("}");
-                indentPrinter.PrintLine();
+                PrintLine("}");
+                PrintLine();
             }
 
-            indentPrinter.Outdent();
+            Outdent();
         }
-        indentPrinter.PrintLine("}");
+        PrintLine("}");
     }
 
     private string GetStubClassName()

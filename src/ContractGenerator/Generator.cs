@@ -9,7 +9,7 @@ public partial class Generator : GeneratorBase
     private GeneratorOptions _options;
     private ServiceDescriptor _serviceDescriptor;
 
-    public Generator(ServiceDescriptor serviceDescriptor, GeneratorOptions options, IndentPrinter? printer = null):base(printer)
+    public Generator(ServiceDescriptor serviceDescriptor, GeneratorOptions options)
     {
         _serviceDescriptor = serviceDescriptor;
         _options = options;
@@ -22,67 +22,67 @@ public partial class Generator : GeneratorBase
     public string? Generate()
     {
         // GenerateDocCommentBody(serviceDescriptor,)
-        indentPrinter.PrintLine($"{AccessLevel} static partial class {ServiceContainerClassName}");
-        indentPrinter.PrintLine("{");
-        indentPrinter.Indent();
-        indentPrinter.PrintLine($"""static readonly string {ServiceFieldName} = "{_serviceDescriptor.FullName}";""");
+        PrintLine($"{AccessLevel} static partial class {ServiceContainerClassName}");
+        PrintLine("{");
+        Indent();
+        PrintLine($"""static readonly string {ServiceFieldName} = "{_serviceDescriptor.FullName}";""");
 
         Marshallers();
-        indentPrinter.PrintLine();
+        PrintLine();
         Methods();
-        indentPrinter.PrintLine();
+        PrintLine();
         Descriptors();
 
         if (_options.GenerateContract)
         {
-            indentPrinter.PrintLine();
+            PrintLine();
             GenerateContractBaseClass();
-            indentPrinter.PrintLine();
+            PrintLine();
             GenerateBindServiceMethod();
         }
 
         if (_options.GenerateStub) GenerateStubClass();
 
         if (_options.GenerateReference) GenerateReferenceClass();
-        indentPrinter.Outdent();
-        indentPrinter.PrintLine("}");
-        return indentPrinter.ToString();
+        Outdent();
+        PrintLine("}");
+        return PrintOut();
     }
 
     private void GenerateAllServiceDescriptorsProperty()
     {
-        indentPrinter.PrintLine(
+        PrintLine(
             "public static global::System.Collections.Generic.IReadOnlyList<global::Google.Protobuf.Reflection.ServiceDescriptor> Descriptors"
         );
-        indentPrinter.PrintLine("{");
+        PrintLine("{");
         {
-            indentPrinter.Indent();
-            indentPrinter.PrintLine("get");
-            indentPrinter.PrintLine("{");
+            Indent();
+            PrintLine("get");
+            PrintLine("{");
             {
-                indentPrinter.Indent();
-                indentPrinter.PrintLine(
+                Indent();
+                PrintLine(
                     "return new global::System.Collections.Generic.List<global::Google.Protobuf.Reflection.ServiceDescriptor>()");
-                indentPrinter.PrintLine("{");
+                PrintLine("{");
                 {
-                    indentPrinter.Indent();
+                    Indent();
                     var services = _serviceDescriptor.GetFullService();
                     foreach (var service in services)
                     {
                         var index = service.Index.ToString();
-                        indentPrinter.PrintLine(
+                        PrintLine(
                             $"{ProtoUtils.GetReflectionClassName(service.File)}.Descriptor.Services[{index}],");
                     }
 
-                    indentPrinter.Outdent();
+                    Outdent();
                 }
-                indentPrinter.PrintLine("};");
-                indentPrinter.Outdent();
+                PrintLine("};");
+                Outdent();
             }
-            indentPrinter.PrintLine("}");
-            indentPrinter.Outdent();
+            PrintLine("}");
+            Outdent();
         }
-        indentPrinter.PrintLine("}");
+        PrintLine("}");
     }
 
     private string GetServerClassName()
@@ -96,28 +96,28 @@ public partial class Generator : GeneratorBase
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L332
     private void Marshallers()
     {
-        indentPrinter.PrintLine("#region Marshallers");
+        PrintLine("#region Marshallers");
         var usedMessages = GetUsedMessages();
         foreach (var usedMessage in usedMessages)
         {
             var fieldName = GetMarshallerFieldName(usedMessage);
             var t = ProtoUtils.GetClassName(usedMessage);
-            indentPrinter.PrintLine(
+            PrintLine(
                 $"static readonly aelf::Marshaller<{t}> {fieldName} = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), {t}.Parser.ParseFrom);");
         }
 
-        indentPrinter.PrintLine("#endregion");
+        PrintLine("#endregion");
     }
 
 
     private void GenerateServiceDescriptorProperty()
     {
-        indentPrinter.PrintLine(
+        PrintLine(
             "public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor");
-        indentPrinter.PrintLine("{");
-        indentPrinter.PrintLine(
+        PrintLine("{");
+        PrintLine(
             $"  get {{ return {ProtoUtils.GetReflectionClassName(_serviceDescriptor.File)}.Descriptor.Services[{_serviceDescriptor.Index}]; }}");
-        indentPrinter.PrintLine("}");
+        PrintLine("}");
     }
 
 

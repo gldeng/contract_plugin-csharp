@@ -22,19 +22,19 @@ public partial class Generator
     {
         var request = ProtoUtils.GetClassName(methodDescriptor.InputType);
         var response = ProtoUtils.GetClassName(methodDescriptor.OutputType);
-        indentPrinter.PrintLine(
+        PrintLine(
             $"static readonly aelf::Method<{request}, $response$> {GetMethodFieldName(methodDescriptor)} = new " +
             $"aelf::Method<{request}, {response}>(");
-        indentPrinter.Indent();
-        indentPrinter.Indent();
-        indentPrinter.PrintLine($"{GetCSharpMethodType(methodDescriptor)},");
-        indentPrinter.PrintLine($"{ServiceFieldName},");
-        indentPrinter.PrintLine($"\"{methodDescriptor.Name}\",");
-        indentPrinter.PrintLine($"{GetMarshallerFieldName(methodDescriptor.InputType)},");
-        indentPrinter.PrintLine($"{GetMarshallerFieldName(methodDescriptor.OutputType)});");
-        indentPrinter.PrintLine();
-        indentPrinter.Outdent();
-        indentPrinter.Outdent();
+        Indent();
+        Indent();
+        PrintLine($"{GetCSharpMethodType(methodDescriptor)},");
+        PrintLine($"{ServiceFieldName},");
+        PrintLine($"\"{methodDescriptor.Name}\",");
+        PrintLine($"{GetMarshallerFieldName(methodDescriptor.InputType)},");
+        PrintLine($"{GetMarshallerFieldName(methodDescriptor.OutputType)});");
+        PrintLine();
+        Outdent();
+        Outdent();
     }
 
     #endregion Methods
@@ -46,7 +46,7 @@ public partial class Generator
         InRegion("Descriptors", () =>
         {
             GenerateServiceDescriptorProperty();
-            indentPrinter.PrintLine();
+            PrintLine();
             GenerateAllServiceDescriptorsProperty();
         });
     }

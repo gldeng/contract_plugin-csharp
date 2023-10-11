@@ -5,14 +5,14 @@ public class EventTypeGeneratorTests : TestBase
     [Fact]
     public void TestGenerateEvent_NoErrors()
     {
-        var indentPrinter = new IndentPrinter();
         var fileDescriptors = GetFileDescriptors("helloworld");
         var msg = fileDescriptors[^1].MessageTypes.Last();
 
-        new EventTypeGenerator(msg, new GeneratorOptions
+        var indentPrinter = new EventTypeGenerator(msg, new GeneratorOptions
         {
             GenerateEvent = true
-        }, indentPrinter).Generate();
+        });
+        indentPrinter.Generate();
         var eventCodeStr = indentPrinter.PrintOut();
         const string expectedCodeStr =
             """
