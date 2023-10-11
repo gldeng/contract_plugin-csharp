@@ -8,46 +8,47 @@ public static class EventTypeGenerator
     public static void GenerateEvent(IndentPrinter printer, MessageDescriptor message, GeneratorOptions options)
     {
         if (!IsEventMessageType(message)) return;
-        printer.Print(
+        printer.PrintLine(
             $"{ProtoUtils.GetAccessLevel(options)} partial class {message.Name} : aelf::IEvent<{message.Name}>");
-        printer.Print("{");
+        printer.PrintLine("{");
         {
             printer.Indent();
             // GetIndexed
-            printer.Print($"public global::System.Collections.Generic.IEnumerable<{message.Name}> GetIndexed()");
-            printer.Print("{");
+            printer.PrintLine($"public global::System.Collections.Generic.IEnumerable<{message.Name}> GetIndexed()");
+            printer.PrintLine("{");
             {
                 printer.Indent();
-                printer.Print($"return new List<{message.Name}>");
-                printer.Print("{");
+                printer.PrintLine($"return new List<{message.Name}>");
+                printer.PrintLine("{");
                 var fields = message.Fields.InFieldNumberOrder();
                 foreach (var field in fields)
                 {
                     if (field == null) continue;
                     if (!IsIndexedField(field)) continue;
-                    printer.Print($"new {message.Name}");
-                    printer.Print("{");
+                    printer.PrintLine($"new {message.Name}");
+                    printer.PrintLine("{");
                     {
                         printer.Indent();
                         var propertyName = ProtoUtils.GetPropertyName(field);
-                        printer.Print($"{propertyName} = {propertyName}");
+                        printer.PrintLine($"{propertyName} = {propertyName}");
                         printer.Outdent();
                     }
-                    printer.Print("},");
+                    printer.PrintLine("},");
                 }
 
-                printer.Print("};");
+                printer.PrintLine("};");
                 printer.Outdent();
             }
-            printer.Print("}\n"); // end GetIndexed
+            printer.PrintLine("}"); // end GetIndexed
+            printer.PrintLine();
 
             // GetNonIndexed
-            printer.Print($"public {message.Name} GetNonIndexed()");
-            printer.Print("{");
+            printer.PrintLine($"public {message.Name} GetNonIndexed()");
+            printer.PrintLine("{");
             {
                 printer.Indent();
-                printer.Print($"return new {message.Name}");
-                printer.Print("{");
+                printer.PrintLine($"return new {message.Name}");
+                printer.PrintLine("{");
                 {
                     printer.Indent();
                     var fields = message.Fields.InFieldNumberOrder();
@@ -56,19 +57,20 @@ public static class EventTypeGenerator
                         if (field == null) continue;
                         if (IsIndexedField(field)) continue;
                         var propertyName = ProtoUtils.GetPropertyName(field);
-                        printer.Print($"{propertyName} = {propertyName},");
+                        printer.PrintLine($"{propertyName} = {propertyName},");
                     }
 
                     printer.Outdent();
                 }
-                printer.Print("};");
+                printer.PrintLine("};");
                 printer.Outdent();
             }
-            printer.Print("}");
+            printer.PrintLine("}");
             printer.Outdent();
         }
 
-        printer.Print("}\n");
+        printer.PrintLine("}");
+        printer.PrintLine();
     }
 
     #region Helper Methods
