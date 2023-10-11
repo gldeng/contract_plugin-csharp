@@ -24,4 +24,21 @@ public class GeneratorBase
         indentPrinter.Outdent();
         indentPrinter.PrintLine("}");
     }
+
+    protected void InBlockWithSemicolon(Action a)
+    {
+        indentPrinter.PrintLine("{");
+        indentPrinter.Indent();
+        a();
+        indentPrinter.Outdent();
+        indentPrinter.PrintLine("};");
+    }
+    protected void InBlockWithComma(Action a)
+    {
+        indentPrinter.PrintLine("{");
+        indentPrinter.Indent();
+        a();
+        indentPrinter.Outdent();
+        indentPrinter.PrintLine("};");
+    }
 }

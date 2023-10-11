@@ -40,67 +40,51 @@ public class EventTypeGenerator : GeneratorBase
         if (!IsEventMessageType(_messageDescriptor)) return null;
         indentPrinter.PrintLine(
             $"{ProtoUtils.GetAccessLevel(_options)} partial class {_messageDescriptor.Name} : aelf::IEvent<{_messageDescriptor.Name}>");
-        indentPrinter.PrintLine("{");
-        {
-            indentPrinter.Indent();
-            // GetIndexed
-            indentPrinter.PrintLine(
-                $"public global::System.Collections.Generic.IEnumerable<{_messageDescriptor.Name}> GetIndexed()");
-            indentPrinter.PrintLine("{");
+        InBlock(() =>
             {
-                indentPrinter.Indent();
-                indentPrinter.PrintLine($"return new List<{_messageDescriptor.Name}>");
-                indentPrinter.PrintLine("{");
-                var fields = _messageDescriptor.Fields.InFieldNumberOrder();
-                foreach (var field in fields)
+                // GetIndexed
+                indentPrinter.PrintLine(
+                    $"public global::System.Collections.Generic.IEnumerable<{_messageDescriptor.Name}> GetIndexed()");
+                InBlock(() =>
                 {
-                    if (field == null) continue;
-                    if (!IsIndexedField(field)) continue;
-                    indentPrinter.PrintLine($"new {_messageDescriptor.Name}");
-                    indentPrinter.PrintLine("{");
+                    indentPrinter.PrintLine($"return new List<{_messageDescriptor.Name}>");
+                    InBlockWithSemicolon(() =>
                     {
-                        indentPrinter.Indent();
-                        var propertyName = ProtoUtils.GetPropertyName(field);
-                        indentPrinter.PrintLine($"{propertyName} = {propertyName}");
-                        indentPrinter.Outdent();
-                    }
-                    indentPrinter.PrintLine("},");
-                }
+                        var fields = _messageDescriptor.Fields.InFieldNumberOrder();
+                        foreach (var field in fields)
+                        {
+                            if (field == null) continue;
+                            if (!IsIndexedField(field)) continue;
+                            indentPrinter.PrintLine($"new {_messageDescriptor.Name}");
+                            InBlockWithComma(() =>
+                            {
+                                var propertyName = ProtoUtils.GetPropertyName(field);
+                                indentPrinter.PrintLine($"{propertyName} = {propertyName}");
+                            });
+                        }
+                    });
+                }); // end GetIndexed
+                indentPrinter.PrintLine();
 
-                indentPrinter.PrintLine("};");
-                indentPrinter.Outdent();
-            }
-            indentPrinter.PrintLine("}"); // end GetIndexed
-            indentPrinter.PrintLine();
-
-            // GetNonIndexed
-            indentPrinter.PrintLine($"public {_messageDescriptor.Name} GetNonIndexed()");
-            indentPrinter.PrintLine("{");
-            {
-                indentPrinter.Indent();
-                indentPrinter.PrintLine($"return new {_messageDescriptor.Name}");
-                indentPrinter.PrintLine("{");
+                // GetNonIndexed
+                indentPrinter.PrintLine($"public {_messageDescriptor.Name} GetNonIndexed()");
+                InBlock(() =>
                 {
-                    indentPrinter.Indent();
-                    var fields = _messageDescriptor.Fields.InFieldNumberOrder();
-                    foreach (var field in fields)
+                    indentPrinter.PrintLine($"return new {_messageDescriptor.Name}");
+                    InBlockWithSemicolon(() =>
                     {
-                        if (field == null) continue;
-                        if (IsIndexedField(field)) continue;
-                        var propertyName = ProtoUtils.GetPropertyName(field);
-                        indentPrinter.PrintLine($"{propertyName} = {propertyName},");
-                    }
-
-                    indentPrinter.Outdent();
-                }
-                indentPrinter.PrintLine("};");
-                indentPrinter.Outdent();
+                        var fields = _messageDescriptor.Fields.InFieldNumberOrder();
+                        foreach (var field in fields)
+                        {
+                            if (field == null) continue;
+                            if (IsIndexedField(field)) continue;
+                            var propertyName = ProtoUtils.GetPropertyName(field);
+                            indentPrinter.PrintLine($"{propertyName} = {propertyName},");
+                        }
+                    });
+                });
             }
-            indentPrinter.PrintLine("}");
-            indentPrinter.Outdent();
-        }
-
-        indentPrinter.PrintLine("}");
+        );
         return indentPrinter.ToString();
     }
 }
