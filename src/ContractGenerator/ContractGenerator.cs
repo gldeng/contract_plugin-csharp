@@ -161,7 +161,7 @@ public class ContractGenerator
 
         if (options.GenerateContainer)
             foreach (var svc in file.Services)
-                ContractContainerGenerator.Generate(indentPrinter, svc, options);
+                new Generator(svc, options, indentPrinter).Generate();
 
         if (fileNameSpace != "")
         {

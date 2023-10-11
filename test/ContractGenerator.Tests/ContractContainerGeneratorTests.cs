@@ -18,7 +18,7 @@ public class ContractContainerGeneratorTests : TestBase
         // flags |= FlagConstants.GenerateStubWithEvent;
         // flags &= FlagConstants.GenerateContract;
 
-        ContractContainerGenerator.Generate(indentPrinter, svc, options);
+        new Generator(svc, options, indentPrinter).Generate();
         var contractContainerCodeStr = indentPrinter.PrintOut();
         const string expectedContainerCodeStr =
             """
@@ -93,7 +93,7 @@ public class ContractContainerGeneratorTests : TestBase
         var fileDescriptors = GetFileDescriptors("contract_with_bases");
         var svc = fileDescriptors[^1].Services.Last();
 
-        ContractContainerGenerator.GenerateContractBaseClass(indentPrinter, svc);
+        new Generator(svc, new GeneratorOptions(), indentPrinter).GenerateContractBaseClass();
         var contractBaseCodeStr = indentPrinter.PrintOut();
         const string expectedCodeStr =
             """
