@@ -25,7 +25,6 @@ public class ContractContainerGenerator
                 $"public abstract {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)});");
         indentPrinter.Outdent();
         indentPrinter.PrintLine("}");
-        indentPrinter.PrintLine();
     }
 
     private static string GetMethodReturnTypeServer(MethodDescriptor method)
@@ -475,6 +474,7 @@ public class ContractContainerGenerator
         {
             indentPrinter.PrintLine();
             GenerateContractBaseClass(indentPrinter, serviceDescriptor);
+            indentPrinter.PrintLine();
             GenerateBindServiceMethod(indentPrinter, serviceDescriptor);
         }
 

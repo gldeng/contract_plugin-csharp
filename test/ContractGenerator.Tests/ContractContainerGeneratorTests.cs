@@ -105,7 +105,6 @@ public class ContractContainerGeneratorTests : TestBase
               public abstract global::Google.Protobuf.WellKnownTypes.Empty Update(global::Google.Protobuf.WellKnownTypes.StringValue input);
             }
 
-
             """;
         Assert.Equal(expectedCodeStr, contractBaseCodeStr);
     }
