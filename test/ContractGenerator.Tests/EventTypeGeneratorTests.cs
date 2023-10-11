@@ -15,25 +15,27 @@ public class EventTypeGeneratorTests : TestBase
         });
         var eventCodeStr = indentPrinter.PrintOut();
         const string expectedCodeStr =
-            @"public partial class UpdatedMessage : aelf::IEvent<UpdatedMessage>
-{
-  public global::System.Collections.Generic.IEnumerable<UpdatedMessage> GetIndexed()
-  {
-    return new List<UpdatedMessage>
-    {
-    };
-  }
+            """
+            public partial class UpdatedMessage : aelf::IEvent<UpdatedMessage>
+            {
+              public global::System.Collections.Generic.IEnumerable<UpdatedMessage> GetIndexed()
+              {
+                return new List<UpdatedMessage>
+                {
+                };
+              }
 
-  public UpdatedMessage GetNonIndexed()
-  {
-    return new UpdatedMessage
-    {
-      Value = Value,
-    };
-  }
-}
+              public UpdatedMessage GetNonIndexed()
+              {
+                return new UpdatedMessage
+                {
+                  Value = Value,
+                };
+              }
+            }
 
-";
+
+            """;
         Assert.Equal(expectedCodeStr, eventCodeStr);
     }
 }
