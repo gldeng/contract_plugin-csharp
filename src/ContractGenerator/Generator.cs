@@ -3,18 +3,16 @@ using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
 
-public partial class Generator
+public partial class Generator : GeneratorBase
 {
     private const string ServiceFieldName = "__ServiceName";
-    private IndentPrinter indentPrinter;
     private GeneratorOptions _options;
     private ServiceDescriptor _serviceDescriptor;
 
-    public Generator(ServiceDescriptor serviceDescriptor, GeneratorOptions options, IndentPrinter? printer = null)
+    public Generator(ServiceDescriptor serviceDescriptor, GeneratorOptions options, IndentPrinter? printer = null):base(printer)
     {
         _serviceDescriptor = serviceDescriptor;
         _options = options;
-        indentPrinter = printer ?? new IndentPrinter();
     }
 
     /// <summary>
@@ -29,18 +27,11 @@ public partial class Generator
         indentPrinter.Indent();
         indentPrinter.PrintLine($"""static readonly string {ServiceFieldName} = "{_serviceDescriptor.FullName}";""");
 
-        GenerateMarshallerFields();
+        Marshallers();
         indentPrinter.PrintLine();
-        indentPrinter.PrintLine("#region Methods");
-        var methods = GetFullMethod();
-        foreach (var method in methods) GenerateStaticMethodField(method);
-        indentPrinter.PrintLine("#endregion");
-
+        Methods();
         indentPrinter.PrintLine();
-        indentPrinter.PrintLine("#region Descriptors");
-        GenerateServiceDescriptorProperty();
-        GenerateAllServiceDescriptorsProperty();
-        indentPrinter.PrintLine("#endregion");
+        Descriptors();
 
         if (_options.GenerateContract)
         {
@@ -103,18 +94,16 @@ public partial class Generator
     ///     Generates a section of instantiated aelf Marshallers as part of the contract
     /// </summary>
     //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L332
-    private void GenerateMarshallerFields()
+    private void Marshallers()
     {
         indentPrinter.PrintLine("#region Marshallers");
         var usedMessages = GetUsedMessages();
         foreach (var usedMessage in usedMessages)
         {
-            var type = ProtoUtils.GetClassName(usedMessage);
+            var fieldName = GetMarshallerFieldName(usedMessage);
+            var t = ProtoUtils.GetClassName(usedMessage);
             indentPrinter.PrintLine(
-                $"static readonly aelf::Marshaller<{type}> {GetMarshallerFieldName(usedMessage)} = " +
-                "aelf::Marshallers.Create((arg) => " +
-                "global::Google.Protobuf.MessageExtensions.ToByteArray(arg), " +
-                $"{type}.Parser.ParseFrom);");
+                $"static readonly aelf::Marshaller<{t}> {fieldName} = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), {t}.Parser.ParseFrom);");
         }
 
         indentPrinter.PrintLine("#endregion");
@@ -124,38 +113,13 @@ public partial class Generator
     private void GenerateServiceDescriptorProperty()
     {
         indentPrinter.PrintLine(
-            "public static global::Google.Protobuf.Reflection.ServiceDescriptor " +
-            "Descriptor");
+            "public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor");
         indentPrinter.PrintLine("{");
         indentPrinter.PrintLine(
             $"  get {{ return {ProtoUtils.GetReflectionClassName(_serviceDescriptor.File)}.Descriptor.Services[{_serviceDescriptor.Index}]; }}");
         indentPrinter.PrintLine("}");
-        indentPrinter.PrintLine();
     }
 
-
-    /// <summary>
-    ///     Generates instantiations for static readonly aelf::Method fields based on the proto
-    /// </summary>
-    //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L349
-    private void GenerateStaticMethodField(MethodDescriptor methodDescriptor)
-    {
-        var request = ProtoUtils.GetClassName(methodDescriptor.InputType);
-        var response = ProtoUtils.GetClassName(methodDescriptor.OutputType);
-        indentPrinter.PrintLine(
-            $"static readonly aelf::Method<{request}, $response$> {GetMethodFieldName(methodDescriptor)} = new " +
-            $"aelf::Method<{request}, {response}>(");
-        indentPrinter.Indent();
-        indentPrinter.Indent();
-        indentPrinter.PrintLine($"{GetCSharpMethodType(methodDescriptor)},");
-        indentPrinter.PrintLine($"{ServiceFieldName},");
-        indentPrinter.PrintLine($"\"{methodDescriptor.Name}\",");
-        indentPrinter.PrintLine($"{GetMarshallerFieldName(methodDescriptor.InputType)},");
-        indentPrinter.PrintLine($"{GetMarshallerFieldName(methodDescriptor.OutputType)});");
-        indentPrinter.PrintLine();
-        indentPrinter.Outdent();
-        indentPrinter.Outdent();
-    }
 
     /// <summary>
     ///     GetMarshallerFieldName formats and returns a marshaller-fieldname based on the original C++ logic

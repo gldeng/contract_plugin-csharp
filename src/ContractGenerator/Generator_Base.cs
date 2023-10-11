@@ -16,14 +16,13 @@ public partial class Generator
             $"/// <summary>Base class for the contract of {serverClassName}</summary>");
         indentPrinter.PrintLine(
             $"public abstract partial class {serverClassName} : AElf.Sdk.CSharp.CSharpSmartContract<{GetStateTypeName()}>");
-        indentPrinter.PrintLine("{");
-        indentPrinter.Indent();
-        var methods = GetFullMethod();
-        foreach (var method in methods)
-            indentPrinter.PrintLine(
-                $"public abstract {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)});");
-        indentPrinter.Outdent();
-        indentPrinter.PrintLine("}");
+        InBlock(() =>
+        {
+            var methods = GetFullMethod();
+            foreach (var method in methods)
+                indentPrinter.PrintLine(
+                    $"public abstract {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)});");
+        });
     }
 
     private string GetStateTypeName()
@@ -82,20 +81,19 @@ public partial class Generator
     {
         indentPrinter.PrintLine(
             $"public static aelf::ServerServiceDefinition BindService({GetServerClassName()} serviceImpl)");
-        indentPrinter.PrintLine("{");
-        indentPrinter.Indent();
-        indentPrinter.PrintLine("return aelf::ServerServiceDefinition.CreateBuilder()");
-        indentPrinter.Indent();
-        indentPrinter.Indent();
-        indentPrinter.PrintLine(".AddDescriptors(Descriptors)");
-        var methods = GetFullMethod();
-        foreach (var method in methods)
-            indentPrinter.PrintLine($".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name}).Build();");
-        indentPrinter.Outdent();
-        indentPrinter.Outdent();
-
-        indentPrinter.Outdent();
-        indentPrinter.PrintLine("}");
+        InBlock(() =>
+        {
+            indentPrinter.PrintLine("return aelf::ServerServiceDefinition.CreateBuilder()");
+            indentPrinter.Indent();
+            indentPrinter.Indent();
+            indentPrinter.PrintLine(".AddDescriptors(Descriptors)");
+            var methods = GetFullMethod();
+            foreach (var method in methods)
+                indentPrinter.PrintLine(
+                    $".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name}).Build();");
+            indentPrinter.Outdent();
+            indentPrinter.Outdent();
+        });
         indentPrinter.PrintLine();
     }
 }

@@ -3,73 +3,16 @@ using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
 
-public static class EventTypeGenerator
+public class EventTypeGenerator : GeneratorBase
 {
-    public static void GenerateEvent(IndentPrinter printer, MessageDescriptor message, GeneratorOptions options)
+    private MessageDescriptor _messageDescriptor;
+    private GeneratorOptions _options;
+
+    public EventTypeGenerator(MessageDescriptor message, GeneratorOptions options, IndentPrinter? printer) :
+        base(printer)
     {
-        if (!IsEventMessageType(message)) return;
-        printer.PrintLine(
-            $"{ProtoUtils.GetAccessLevel(options)} partial class {message.Name} : aelf::IEvent<{message.Name}>");
-        printer.PrintLine("{");
-        {
-            printer.Indent();
-            // GetIndexed
-            printer.PrintLine($"public global::System.Collections.Generic.IEnumerable<{message.Name}> GetIndexed()");
-            printer.PrintLine("{");
-            {
-                printer.Indent();
-                printer.PrintLine($"return new List<{message.Name}>");
-                printer.PrintLine("{");
-                var fields = message.Fields.InFieldNumberOrder();
-                foreach (var field in fields)
-                {
-                    if (field == null) continue;
-                    if (!IsIndexedField(field)) continue;
-                    printer.PrintLine($"new {message.Name}");
-                    printer.PrintLine("{");
-                    {
-                        printer.Indent();
-                        var propertyName = ProtoUtils.GetPropertyName(field);
-                        printer.PrintLine($"{propertyName} = {propertyName}");
-                        printer.Outdent();
-                    }
-                    printer.PrintLine("},");
-                }
-
-                printer.PrintLine("};");
-                printer.Outdent();
-            }
-            printer.PrintLine("}"); // end GetIndexed
-            printer.PrintLine();
-
-            // GetNonIndexed
-            printer.PrintLine($"public {message.Name} GetNonIndexed()");
-            printer.PrintLine("{");
-            {
-                printer.Indent();
-                printer.PrintLine($"return new {message.Name}");
-                printer.PrintLine("{");
-                {
-                    printer.Indent();
-                    var fields = message.Fields.InFieldNumberOrder();
-                    foreach (var field in fields)
-                    {
-                        if (field == null) continue;
-                        if (IsIndexedField(field)) continue;
-                        var propertyName = ProtoUtils.GetPropertyName(field);
-                        printer.PrintLine($"{propertyName} = {propertyName},");
-                    }
-
-                    printer.Outdent();
-                }
-                printer.PrintLine("};");
-                printer.Outdent();
-            }
-            printer.PrintLine("}");
-            printer.Outdent();
-        }
-
-        printer.PrintLine("}");
+        _messageDescriptor = message;
+        _options = options;
     }
 
     #region Helper Methods
@@ -91,4 +34,73 @@ public static class EventTypeGenerator
     }
 
     #endregion
+
+    public string? Generate()
+    {
+        if (!IsEventMessageType(_messageDescriptor)) return null;
+        indentPrinter.PrintLine(
+            $"{ProtoUtils.GetAccessLevel(_options)} partial class {_messageDescriptor.Name} : aelf::IEvent<{_messageDescriptor.Name}>");
+        indentPrinter.PrintLine("{");
+        {
+            indentPrinter.Indent();
+            // GetIndexed
+            indentPrinter.PrintLine(
+                $"public global::System.Collections.Generic.IEnumerable<{_messageDescriptor.Name}> GetIndexed()");
+            indentPrinter.PrintLine("{");
+            {
+                indentPrinter.Indent();
+                indentPrinter.PrintLine($"return new List<{_messageDescriptor.Name}>");
+                indentPrinter.PrintLine("{");
+                var fields = _messageDescriptor.Fields.InFieldNumberOrder();
+                foreach (var field in fields)
+                {
+                    if (field == null) continue;
+                    if (!IsIndexedField(field)) continue;
+                    indentPrinter.PrintLine($"new {_messageDescriptor.Name}");
+                    indentPrinter.PrintLine("{");
+                    {
+                        indentPrinter.Indent();
+                        var propertyName = ProtoUtils.GetPropertyName(field);
+                        indentPrinter.PrintLine($"{propertyName} = {propertyName}");
+                        indentPrinter.Outdent();
+                    }
+                    indentPrinter.PrintLine("},");
+                }
+
+                indentPrinter.PrintLine("};");
+                indentPrinter.Outdent();
+            }
+            indentPrinter.PrintLine("}"); // end GetIndexed
+            indentPrinter.PrintLine();
+
+            // GetNonIndexed
+            indentPrinter.PrintLine($"public {_messageDescriptor.Name} GetNonIndexed()");
+            indentPrinter.PrintLine("{");
+            {
+                indentPrinter.Indent();
+                indentPrinter.PrintLine($"return new {_messageDescriptor.Name}");
+                indentPrinter.PrintLine("{");
+                {
+                    indentPrinter.Indent();
+                    var fields = _messageDescriptor.Fields.InFieldNumberOrder();
+                    foreach (var field in fields)
+                    {
+                        if (field == null) continue;
+                        if (IsIndexedField(field)) continue;
+                        var propertyName = ProtoUtils.GetPropertyName(field);
+                        indentPrinter.PrintLine($"{propertyName} = {propertyName},");
+                    }
+
+                    indentPrinter.Outdent();
+                }
+                indentPrinter.PrintLine("};");
+                indentPrinter.Outdent();
+            }
+            indentPrinter.PrintLine("}");
+            indentPrinter.Outdent();
+        }
+
+        indentPrinter.PrintLine("}");
+        return indentPrinter.ToString();
+    }
 }

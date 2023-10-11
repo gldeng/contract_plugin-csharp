@@ -81,7 +81,7 @@ public class ContractGeneratorTests
                     __Marshaller_google_protobuf_Empty,
                     __Marshaller_google_protobuf_StringValue);
 
-                #endregion
+                #endregion Methods
 
                 #region Descriptors
                 public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -99,7 +99,7 @@ public class ContractGeneratorTests
                     };
                   }
                 }
-                #endregion
+                #endregion Descriptors
 
                 /// <summary>Base class for the contract of HelloWorldBase</summary>
                 public abstract partial class HelloWorldBase : AElf.Sdk.CSharp.CSharpSmartContract<AElf.Contracts.HelloWorld.HelloWorldState>

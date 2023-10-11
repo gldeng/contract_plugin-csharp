@@ -9,10 +9,10 @@ public class EventTypeGeneratorTests : TestBase
         var fileDescriptors = GetFileDescriptors("helloworld");
         var msg = fileDescriptors[^1].MessageTypes.Last();
 
-        EventTypeGenerator.GenerateEvent(indentPrinter, msg, new GeneratorOptions
+        new EventTypeGenerator(msg, new GeneratorOptions
         {
             GenerateEvent = true
-        });
+        }, indentPrinter).Generate();
         var eventCodeStr = indentPrinter.PrintOut();
         const string expectedCodeStr =
             """
