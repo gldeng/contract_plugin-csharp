@@ -40,13 +40,6 @@ public class ProtoUtils
         return GetFileNameBase(descriptor) + "Reflection";
     }
 
-
-    // Implementation follows C++ original https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
-    public static string GetAccessLevel(GeneratorOptions options)
-    {
-        return options.InternalAccess ? "internal" : "public";
-    }
-
     private static string ToCSharpName(string name, FileDescriptor fileDescriptor)
     {
         var result = GetFileNamespace(fileDescriptor);

@@ -19,7 +19,7 @@ public class EventTypeGenerator : GeneratorBase
     public string? Generate()
     {
         if (!_messageDescriptor.IsEventMessageType()) return null;
-        var accessLevel = ProtoUtils.GetAccessLevel(_options);
+        var accessLevel = _options.GetAccessLevel();
         var typeName = _messageDescriptor.Name;
         indentPrinter.PrintLine($"{accessLevel} partial class {typeName} : aelf::IEvent<{typeName}>");
         InBlock(() =>
