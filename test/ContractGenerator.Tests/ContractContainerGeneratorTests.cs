@@ -82,7 +82,6 @@ public class ContractContainerGeneratorTests : TestBase
 
             }
 
-
             """;
         Assert.Equal(expectedContainerCodeStr, contractContainerCodeStr);
     }

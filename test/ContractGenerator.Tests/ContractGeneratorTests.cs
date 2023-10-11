@@ -56,7 +56,6 @@ public class ContractGeneratorTests
                   };
                 }
               }
-
               #endregion
 
               public static partial class HelloWorldContainer
@@ -118,7 +117,6 @@ public class ContractGeneratorTests
                 }
 
               }
-
             }
             #endregion
 

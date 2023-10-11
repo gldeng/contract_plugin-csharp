@@ -70,7 +70,6 @@ public static class EventTypeGenerator
         }
 
         printer.PrintLine("}");
-        printer.PrintLine();
     }
 
     #region Helper Methods

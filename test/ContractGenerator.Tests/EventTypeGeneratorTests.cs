@@ -34,7 +34,6 @@ public class EventTypeGeneratorTests : TestBase
               }
             }
 
-
             """;
         Assert.Equal(expectedCodeStr, eventCodeStr);
     }

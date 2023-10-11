@@ -214,7 +214,6 @@ public class ContractContainerGenerator
         }
 
         indentPrinter.PrintLine("#endregion");
-        indentPrinter.PrintLine();
     }
 
     /// <summary>
@@ -388,7 +387,8 @@ public class ContractContainerGenerator
         return service.Name + "ReferenceState";
     }
 
-    private static void GenerateReferenceClass(IndentPrinter indentPrinter, ServiceDescriptor service, GeneratorOptions options)
+    private static void GenerateReferenceClass(IndentPrinter indentPrinter, ServiceDescriptor service,
+        GeneratorOptions options)
     {
         // TODO: Maybe provide ContractReferenceState in options
         indentPrinter.PrintLine(
@@ -459,20 +459,21 @@ public class ContractContainerGenerator
             $"static readonly string {GetServiceNameFieldName()} = \"{serviceDescriptor.FullName}\";");
 
         GenerateMarshallerFields(indentPrinter, serviceDescriptor);
+        indentPrinter.PrintLine();
         indentPrinter.PrintLine("#region Methods");
         var methods = GetFullMethod(serviceDescriptor);
         foreach (var method in methods) GenerateStaticMethodField(indentPrinter, method);
         indentPrinter.PrintLine("#endregion");
-        indentPrinter.PrintLine();
 
+        indentPrinter.PrintLine();
         indentPrinter.PrintLine("#region Descriptors");
         GenerateServiceDescriptorProperty(indentPrinter, serviceDescriptor);
         GenerateAllServiceDescriptorsProperty(indentPrinter, serviceDescriptor);
         indentPrinter.PrintLine("#endregion");
-        indentPrinter.PrintLine();
 
         if (options.GenerateContract)
         {
+            indentPrinter.PrintLine();
             GenerateContractBaseClass(indentPrinter, serviceDescriptor);
             GenerateBindServiceMethod(indentPrinter, serviceDescriptor);
         }
@@ -482,7 +483,6 @@ public class ContractContainerGenerator
         if (options.GenerateReference) GenerateReferenceClass(indentPrinter, serviceDescriptor, options);
         indentPrinter.Outdent();
         indentPrinter.PrintLine("}");
-        indentPrinter.PrintLine();
     }
 
     private class ServiceDescriptorComparer : IComparer<ServiceDescriptor>
