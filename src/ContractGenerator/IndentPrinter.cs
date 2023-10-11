@@ -19,14 +19,34 @@ public class IndentPrinter
         _indents--;
     }
 
-    public void Print(string str)
+    public void PrintLine()
     {
-        for (var i = 0; i < _indents; i++) _stringBuilder.Append("  ");
-        _stringBuilder.AppendLine(str);
+        PrintLine(String.Empty);
+    }
+
+    public void PrintLine(string str)
+    {
+        var lines = str.Split(Environment.NewLine);
+        foreach (var line in lines)
+        {
+            PrintOneLine(line);
+        }
     }
 
     public string PrintOut()
     {
         return _stringBuilder.ToString();
+    }
+
+    private void PrintOneLine(string line)
+    {
+        if (line.Trim().Length == 0)
+        {
+            _stringBuilder.AppendLine();
+            return;
+        }
+
+        for (var i = 0; i < _indents; i++) _stringBuilder.Append("  ");
+        _stringBuilder.AppendLine(line);
     }
 }

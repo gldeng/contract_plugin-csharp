@@ -41,9 +41,9 @@ public class ProtoUtils
 
 
     // Implementation follows C++ original https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L251
-    public static string GetAccessLevel(byte flags)
+    public static string GetAccessLevel(GeneratorOptions options)
     {
-        return (flags & FlagConstants.InternalAccess) != 0 ? "internal" : "public";
+        return options.InternalAccess ? "internal" : "public";
     }
 
     private static string ToCSharpName(string name, FileDescriptor fileDescriptor)
@@ -116,7 +116,7 @@ public class ProtoUtils
     ///     Extract the C# Namespace for the target contract based on the Proto data.
     /// </summary>
     //TODO Implementation https://github.com/protocolbuffers/protobuf/blob/e57166b65a6d1d55fc7b18beaae000565f617f22/src/google/protobuf/compiler/csharp/names.cc#L66
-    private static string GetFileNamespace(FileDescriptor fileDescriptor)
+    public static string GetFileNamespace(FileDescriptor fileDescriptor)
     {
         return fileDescriptor.GetOptions().HasCsharpNamespace
             ? fileDescriptor.GetOptions().CsharpNamespace

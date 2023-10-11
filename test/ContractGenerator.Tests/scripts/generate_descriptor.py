@@ -15,6 +15,7 @@ def get_command(testcase_name):
         f'-o"{testcases_dir}/{testcase_name}/{descriptor_filename}"',
         "--include_imports",
         "--retain_options",
+        # "--contract_opt=stub", tried following https://github.com/AElfProject/AElf/blob/bd91fc5e23f03f5179cee9fc6cfd5a0ee5b802d2/scripts/generate_event_only.sh#L13C1-L13C28 tho this throws protoc errors
         proto_filename
     ]
 

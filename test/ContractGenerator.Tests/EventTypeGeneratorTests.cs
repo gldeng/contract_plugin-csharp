@@ -9,7 +9,10 @@ public class EventTypeGeneratorTests : TestBase
         var fileDescriptors = GetFileDescriptors("helloworld");
         var msg = fileDescriptors[^1].MessageTypes.Last();
 
-        EventTypeGenerator.GenerateEvent(indentPrinter, msg, FlagConstants.GenerateEvent);
+        EventTypeGenerator.GenerateEvent(indentPrinter, msg, new GeneratorOptions
+        {
+            GenerateEvent = true
+        });
         var eventCodeStr = indentPrinter.PrintOut();
         const string expectedCodeStr =
             @"public partial class UpdatedMessage : aelf::IEvent<UpdatedMessage>
