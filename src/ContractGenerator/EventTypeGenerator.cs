@@ -1,4 +1,5 @@
 using AElf;
+using ContractGenerator.Primitives;
 using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
@@ -15,21 +16,9 @@ public class EventTypeGenerator : GeneratorBase
         _options = options;
     }
 
-    #region Helper Methods
-
-    /// <summary>
-    ///     Determines if the proto-message is of EventType based on Aelf.options
-    /// </summary>
-    public static bool IsEventMessageType(MessageDescriptor message)
-    {
-        return message.GetOptions().GetExtension(OptionsExtensions.IsEvent);
-    }
-
-    #endregion
-
     public string? Generate()
     {
-        if (!IsEventMessageType(_messageDescriptor)) return null;
+        if (!_messageDescriptor.IsEventMessageType()) return null;
         indentPrinter.PrintLine(
             $"{ProtoUtils.GetAccessLevel(_options)} partial class {_messageDescriptor.Name} : aelf::IEvent<{_messageDescriptor.Name}>");
         InBlock(() =>

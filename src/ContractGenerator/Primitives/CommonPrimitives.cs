@@ -1,4 +1,4 @@
-namespace ContractGenerator;
+namespace ContractGenerator.Primitives;
 
 public static class CommonPrimitives
 {

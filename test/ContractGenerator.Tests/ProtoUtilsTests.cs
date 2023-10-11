@@ -1,4 +1,5 @@
 using AElf;
+using ContractGenerator.Primitives;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 

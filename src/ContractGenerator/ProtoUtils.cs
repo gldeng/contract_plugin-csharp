@@ -1,3 +1,4 @@
+using ContractGenerator.Primitives;
 using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;

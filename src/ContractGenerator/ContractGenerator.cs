@@ -1,4 +1,5 @@
 using System.Text;
+using ContractGenerator.Primitives;
 using Google.Protobuf.Compiler;
 using Google.Protobuf.Reflection;
 
@@ -90,7 +91,7 @@ public class ContractGenerator
 
     private static bool HasEvent(FileDescriptor file)
     {
-        return file.MessageTypes.Any(EventTypeGenerator.IsEventMessageType);
+        return file.MessageTypes.Any(m => m.IsEventMessageType());
     }
 
 
