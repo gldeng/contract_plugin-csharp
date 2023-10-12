@@ -20,9 +20,9 @@ public class ContractGeneratorTests
             GenerateEvent = true
         });
 
-        Assert.Single(response.File);
-        Assert.Equal("Contract.c.cs", response.File[0].Name);
-        Assert.True(response.File[0].HasContent);
+        Assert.Single(response);
+        Assert.Equal("Contract.c.cs", response[0].Name);
+        Assert.True(response[0].HasContent);
 
         const string expectedContractContents =
             """
@@ -123,6 +123,6 @@ public class ContractGeneratorTests
 
             """;
 
-        Assert.Equal(expectedContractContents, response.File[0].Content);
+        Assert.Equal(expectedContractContents, response[0].Content);
     }
 }

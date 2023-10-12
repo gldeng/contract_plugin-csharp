@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace ContractGenerator.Primitives;
 
 public static class CommonPrimitives
@@ -70,5 +72,24 @@ public static class CommonPrimitives
             // Concatenate a _ at the beginning
             result = '_' + result;
         return result;
+    }
+
+    internal static string LowerUnderscoreToUpperCamel(this string str)
+    {
+        var tokens = str.Split('_');
+        var result = new StringBuilder();
+
+        foreach (var token in tokens) result.Append(token.CapitalizeFirstLetter());
+
+        return result.ToString();
+    }
+
+    internal static string CapitalizeFirstLetter(this string str)
+    {
+        if (string.IsNullOrEmpty(str)) return str;
+
+        var chars = str.ToCharArray();
+        chars[0] = char.ToUpper(chars[0]);
+        return new string(chars);
     }
 }

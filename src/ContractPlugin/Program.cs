@@ -20,7 +20,9 @@ internal class Program
         var fileDescriptors = FileDescriptorSetLoader.Load(request.ProtoFile);
 
         var options = ParameterParser.Parse(request.Parameter);
-        var response = ContractGenerator.ContractGenerator.Generate(fileDescriptors, options);
+        var outputFiles = ContractGenerator.ContractGenerator.Generate(fileDescriptors, options);
+        var response = new CodeGeneratorResponse();
+        response.File.AddRange(outputFiles);
 
         // set result to standard output
         using var stdout = Console.OpenStandardOutput();
