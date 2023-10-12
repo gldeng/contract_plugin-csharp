@@ -31,6 +31,7 @@ public class ContractGeneratorTests
             //     source: contract.proto
             // </auto-generated>
             #pragma warning disable 0414, 1591
+
             #region Designer generated code
 
             using System.Collections.Generic;
@@ -56,7 +57,7 @@ public class ContractGeneratorTests
                   };
                 }
               }
-              #endregion
+              #endregion Events
 
               public static partial class HelloWorldContainer
               {
@@ -118,8 +119,7 @@ public class ContractGeneratorTests
 
               }
             }
-            #endregion
-
+            #endregion Designer generated code
 
             """;
 

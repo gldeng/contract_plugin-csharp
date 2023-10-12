@@ -15,7 +15,7 @@ public class EventTypeGenerator : GeneratorBase
         _options = options;
     }
 
-    public string? Generate()
+    public override string? Generate()
     {
         if (!_messageDescriptor.IsEventMessageType()) return null;
         var accessLevel = _options.GetAccessLevel();

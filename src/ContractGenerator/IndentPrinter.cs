@@ -36,6 +36,12 @@ public class IndentPrinter
         _stringBuilder.Append(lines.Last());
     }
 
+    public void PrintIgnoreWhitespace(string? str)
+    {
+        if (string.IsNullOrWhiteSpace(str)) return;
+        Print(str);
+    }
+
     public void PrintLine(string str)
     {
         var lines = str.Split(Environment.NewLine);

@@ -1,8 +1,7 @@
 namespace ContractGenerator;
 
-public class GeneratorBase : IndentPrinter
+public abstract class GeneratorBase : IndentPrinter
 {
-
     protected void InRegion(string name, Action a)
     {
         PrintLine($"#region {name}");
@@ -36,4 +35,6 @@ public class GeneratorBase : IndentPrinter
         Outdent();
         PrintLine("};");
     }
+
+    public abstract string? Generate();
 }
