@@ -5,7 +5,6 @@ namespace ContractGenerator;
 
 public class ServiceGenerator : GeneratorBase
 {
-    private const string ServiceFieldName = "__ServiceName";
     private GeneratorOptions _options;
     private FileDescriptor _fileDescriptor;
 

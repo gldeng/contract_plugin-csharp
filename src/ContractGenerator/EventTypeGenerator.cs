@@ -1,4 +1,3 @@
-using AElf;
 using ContractGenerator.Primitives;
 using Google.Protobuf.Reflection;
 
@@ -6,8 +5,8 @@ namespace ContractGenerator;
 
 public class EventTypeGenerator : GeneratorBase
 {
-    private MessageDescriptor _messageDescriptor;
-    private GeneratorOptions _options;
+    private readonly MessageDescriptor _messageDescriptor;
+    private readonly GeneratorOptions _options;
 
     public EventTypeGenerator(MessageDescriptor message, GeneratorOptions options)
     {

@@ -1,4 +1,3 @@
-using System.Text;
 using ContractGenerator.Primitives;
 using Google.Protobuf.Compiler;
 using Google.Protobuf.Reflection;

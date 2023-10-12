@@ -6,27 +6,27 @@ namespace ContractGenerator;
 
 public static class FileDescriptorSetLoader
 {
-    private static readonly ExtensionRegistry _extensionRegistry = new();
+    private static readonly ExtensionRegistry ExtensionRegistry = new();
 
     static FileDescriptorSetLoader()
     {
-        _extensionRegistry.Add(OptionsExtensions.Identity);
-        _extensionRegistry.Add(OptionsExtensions.Base);
-        _extensionRegistry.Add(OptionsExtensions.CsharpState);
-        _extensionRegistry.Add(OptionsExtensions.IsView);
-        _extensionRegistry.Add(OptionsExtensions.IsEvent);
-        _extensionRegistry.Add(OptionsExtensions.IsIndexed);
+        ExtensionRegistry.Add(OptionsExtensions.Identity);
+        ExtensionRegistry.Add(OptionsExtensions.Base);
+        ExtensionRegistry.Add(OptionsExtensions.CsharpState);
+        ExtensionRegistry.Add(OptionsExtensions.IsView);
+        ExtensionRegistry.Add(OptionsExtensions.IsEvent);
+        ExtensionRegistry.Add(OptionsExtensions.IsIndexed);
     }
 
     public static IReadOnlyList<FileDescriptor> Load(Stream stream)
     {
-        var fds = FileDescriptorSet.Parser.WithExtensionRegistry(_extensionRegistry).ParseFrom(stream);
+        var fds = FileDescriptorSet.Parser.WithExtensionRegistry(ExtensionRegistry).ParseFrom(stream);
         return Load(fds.File);
     }
 
     public static IReadOnlyList<FileDescriptor> Load(IEnumerable<FileDescriptorProto> protos)
     {
         var fileInByteStrings = protos.Select(f => f.ToByteString());
-        return FileDescriptor.BuildFromByteStrings(fileInByteStrings, _extensionRegistry);
+        return FileDescriptor.BuildFromByteStrings(fileInByteStrings, ExtensionRegistry);
     }
 }
