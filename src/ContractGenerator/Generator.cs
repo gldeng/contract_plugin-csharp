@@ -18,7 +18,6 @@ public partial class Generator : GeneratorBase
     /// <summary>
     ///     Generate will produce a chunk of C# code that serves as the container class of the AElf Contract.
     /// </summary>
-    //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L612
     public override string? Generate()
     {
         // GenerateDocCommentBody(serviceDescriptor,)
@@ -102,7 +101,6 @@ public partial class Generator : GeneratorBase
     /// <summary>
     ///     Generates a section of instantiated aelf Marshallers as part of the contract
     /// </summary>
-    //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L332
     private void Marshallers()
     {
         PrintLine("#region Marshallers");
@@ -141,7 +139,6 @@ public partial class Generator : GeneratorBase
         return "__Marshaller_" + msgFullName.Replace(".", "_");
     }
 
-    //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L222
     private List<MethodDescriptor> GetFullMethod()
     {
         return _serviceDescriptor.GetFullService().SelectMany(serviceItem => serviceItem.Methods).ToList();
@@ -201,6 +198,5 @@ public partial class Generator : GeneratorBase
 
     private string AccessLevel => _options.InternalAccess ? "internal" : "public";
 
-    //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L115
     private string ServiceContainerClassName => $"{_serviceDescriptor.Name}Container";
 }

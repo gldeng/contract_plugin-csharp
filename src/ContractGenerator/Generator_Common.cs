@@ -17,7 +17,6 @@ public partial class Generator
     /// <summary>
     ///     Generates instantiations for static readonly aelf::Method fields based on the proto
     /// </summary>
-    //TODO Implement following https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L349
     private void GenerateStaticMethodField(MethodDescriptor methodDescriptor)
     {
         var request = ProtoUtils.GetClassName(methodDescriptor.InputType);

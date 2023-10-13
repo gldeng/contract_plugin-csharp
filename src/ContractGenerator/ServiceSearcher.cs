@@ -5,7 +5,6 @@ namespace ContractGenerator;
 
 public static class ServiceSearcher
 {
-    //TODO Implement https://github.com/AElfProject/contract-plugin/blob/453bebfec0dd2fdcc06d86037055c80721d24e8a/src/contract_csharp_generator.cc#L204
     public static IEnumerable<ServiceDescriptor> GetFullService(this ServiceDescriptor service)
     {
         var allDependedServices = new List<ServiceDescriptor>();
