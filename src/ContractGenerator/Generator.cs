@@ -106,7 +106,7 @@ public partial class Generator : AbstractGenerator
                     {
                         var index = service.Index.ToString();
                         _(
-                            $"{ProtoUtils.GetReflectionClassName(service.File)}.Descriptor.Services[{index}],");
+                            $"{service.File.GetReflectionClassName()}.Descriptor.Services[{index}],");
                     }
                 });
             });
@@ -142,7 +142,7 @@ public partial class Generator : AbstractGenerator
             "public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor");
         _("{");
         _(
-            $"  get {{ return {ProtoUtils.GetReflectionClassName(_serviceDescriptor.File)}.Descriptor.Services[{_serviceDescriptor.Index}]; }}");
+            $"  get {{ return {_serviceDescriptor.File.GetReflectionClassName()}.Descriptor.Services[{_serviceDescriptor.Index}]; }}");
         _("}");
     }
 

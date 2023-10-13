@@ -27,6 +27,35 @@ public static class FilePrimitives
         return FileNameInUpperCamel(file, false) + ".c.cs";
     }
 
+    public static string GetReflectionClassName(this FileDescriptor descriptor)
+    {
+        var result = descriptor.GetNamespace();
+        if (result.Length > 0) result += '.';
+        result += GetReflectionClassUnqualifiedName(descriptor);
+        return "global::" + result;
+
+        static string GetReflectionClassUnqualifiedName(FileDescriptor descriptor)
+        {
+            // TODO: Detect collisions with existing messages,
+            // and append an underscore if necessary.
+            return GetFileNameBase(descriptor) + "Reflection";
+        }
+
+        static string GetFileNameBase(IDescriptor descriptor)
+        {
+            var protoFile = descriptor.Name;
+            var lastSlash = protoFile.LastIndexOf('/');
+            var stringBase = protoFile[(lastSlash + 1)..];
+            return StripDotProto(stringBase).UnderscoresToPascalCase();
+        }
+
+        static string StripDotProto(string protoFile)
+        {
+            var lastIndex = protoFile.LastIndexOf(".", StringComparison.Ordinal);
+            return protoFile[..lastIndex];
+        }
+    }
+
     #region Private Methods
 
     private static string FileNameInUpperCamel(IDescriptor file, bool includePackagePath)
