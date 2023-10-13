@@ -5,7 +5,6 @@ namespace ContractGenerator.Primitives;
 
 public static class MessagePrimitives
 {
-
     /// <summary>
     ///     Determines if the proto-message is of EventType based on Aelf.options
     /// </summary>

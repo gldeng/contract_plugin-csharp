@@ -1,3 +1,5 @@
+using ContractGenerator.Primitives;
+
 namespace ContractGenerator;
 
 public partial class Generator
@@ -10,7 +12,7 @@ public partial class Generator
             foreach (var method in FullMethods)
             {
                 _(
-                    $"public aelf::IMethodStub<{ProtoUtils.GetClassName(method.InputType)}, {ProtoUtils.GetClassName(method.OutputType)}> {method.Name}");
+                    $"public aelf::IMethodStub<{method.InputType.GetFullTypeName()}, {method.OutputType.GetFullTypeName()}> {method.Name}");
                 InBlock(() => { _($"get {{ return __factory.Create({GetMethodFieldName(method)}); }}"); });
                 ___EmptyLine___();
             }

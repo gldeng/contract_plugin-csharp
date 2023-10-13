@@ -1,4 +1,5 @@
 using AElf;
+using ContractGenerator.Primitives;
 using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
@@ -12,6 +13,30 @@ public partial class Generator : AbstractGenerator
 
     private string ServiceContainerClassName => $"{_serviceDescriptor.Name}Container";
     private IEnumerable<ServiceDescriptor> FullServices => _serviceDescriptor.GetFullService();
+
+    private IEnumerable<MessageDescriptor> AllReferenceMessages
+    {
+        get
+        {
+            var descriptorSet = new HashSet<IDescriptor>();
+            var result = new List<MessageDescriptor>();
+
+            foreach (var method in FullMethods)
+            {
+                if (!descriptorSet.Contains(method.InputType))
+                {
+                    descriptorSet.Add(method.InputType);
+                    result.Add(method.InputType);
+                }
+
+                if (descriptorSet.Contains(method.OutputType)) continue;
+                descriptorSet.Add(method.OutputType);
+                result.Add(method.OutputType);
+            }
+
+            return result;
+        }
+    }
 
     private IEnumerable<MethodDescriptor> FullMethods =>
         _serviceDescriptor.GetFullService().SelectMany(serviceItem => serviceItem.Methods).ToList();
@@ -100,11 +125,10 @@ public partial class Generator : AbstractGenerator
     {
         InRegion("Marshallers", () =>
         {
-            var usedMessages = GetUsedMessages();
-            foreach (var usedMessage in usedMessages)
+            foreach (var usedMessage in AllReferenceMessages)
             {
                 var fieldName = GetMarshallerFieldName(usedMessage);
-                var t = ProtoUtils.GetClassName(usedMessage);
+                var t = usedMessage.GetFullTypeName();
                 _(
                     $"static readonly aelf::Marshaller<{t}> {fieldName} = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), {t}.Parser.ParseFrom);");
             }
@@ -148,32 +172,6 @@ public partial class Generator : AbstractGenerator
     private static bool IsViewOnlyMethod(MethodDescriptor method)
     {
         return method.GetOptions().GetExtension(OptionsExtensions.IsView);
-    }
-
-    /// <summary>
-    ///     GetUsedMessages extracts messages from Proto ServiceDescriptor based on the original C++ logic
-    ///     found here
-    ///     https://github.com/AElfProject/contract-plugin/blob/de625fcb79f83603e29d201c8488f101b40f573c/src/contract_csharp_generator.cc#L312
-    /// </summary>
-    private List<IDescriptor> GetUsedMessages()
-    {
-        var descriptorSet = new HashSet<IDescriptor>();
-        var result = new List<IDescriptor>();
-
-        foreach (var method in FullMethods)
-        {
-            if (!descriptorSet.Contains(method.InputType))
-            {
-                descriptorSet.Add(method.InputType);
-                result.Add(method.InputType);
-            }
-
-            if (descriptorSet.Contains(method.OutputType)) continue;
-            descriptorSet.Add(method.OutputType);
-            result.Add(method.OutputType);
-        }
-
-        return result;
     }
 
 

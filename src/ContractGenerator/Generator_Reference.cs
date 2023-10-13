@@ -14,8 +14,8 @@ public partial class Generator
         {
             foreach (var method in FullMethods)
             {
-                var request = ProtoUtils.GetClassName(method.InputType);
-                var response = ProtoUtils.GetClassName(method.OutputType);
+                var request = method.InputType.GetFullTypeName();
+                var response = method.OutputType.GetFullTypeName();
                 _(
                     $"{PublicOrInternal} global::AElf.Sdk.CSharp.State.MethodReference<{request}, {response}> {method.Name} {{ get; set; }}");
             }

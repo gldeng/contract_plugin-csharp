@@ -1,4 +1,5 @@
 using System.Text;
+using Google.Protobuf.Reflection;
 
 namespace ContractGenerator.Primitives;
 
@@ -91,5 +92,27 @@ public static class CommonPrimitives
         var chars = str.ToCharArray();
         chars[0] = char.ToUpper(chars[0]);
         return new string(chars);
+    }
+
+    public static string GetFullTypeName(this IDescriptor descriptor)
+    {
+        return FullQualifiedName(descriptor.FullName, descriptor.File);
+
+        string FullQualifiedName(string name, FileDescriptor fileDescriptor)
+        {
+            var @namespace = fileDescriptor.GetNamespace();
+            if (!string.IsNullOrEmpty(@namespace)) @namespace += '.';
+
+            var classname = string.IsNullOrEmpty(fileDescriptor.Package)
+                ? name
+                :
+                // Strip the proto package from full_name since we've replaced it with
+                // the C# namespace.
+                name[(fileDescriptor.Package.Length + 1)..];
+
+            classname = classname.Replace(".", ".Types.");
+            classname = classname.Replace(".proto", ""); //strip-out the .proto
+            return $"global::{@namespace}{classname}";
+        }
     }
 }

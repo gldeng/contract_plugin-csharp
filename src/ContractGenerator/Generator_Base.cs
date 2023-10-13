@@ -1,4 +1,5 @@
 using AElf;
+using ContractGenerator.Primitives;
 using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
@@ -55,7 +56,7 @@ public partial class Generator
 
     private static string GetMethodReturnTypeServer(MethodDescriptor method)
     {
-        return ProtoUtils.GetClassName(method.OutputType);
+        return method.OutputType.GetFullTypeName();
     }
 
     private static string GetMethodRequestParamServer(MethodDescriptor method)
@@ -64,11 +65,10 @@ public partial class Generator
         {
             case MethodType.MethodtypeNoStreaming:
             case MethodType.MethodtypeServerStreaming:
-                return ProtoUtils.GetClassName(method.InputType) + " input";
+                return method.InputType.GetFullTypeName() + " input";
             case MethodType.MethodtypeClientStreaming:
             case MethodType.MethodtypeBidiStreaming:
-                return "grpc::IAsyncStreamReader<" + ProtoUtils.GetClassName(method.InputType) +
-                       "> requestStream";
+                return $"grpc::IAsyncStreamReader<{method.InputType.GetFullTypeName()}> requestStream";
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -83,8 +83,7 @@ public partial class Generator
                 return "";
             case MethodType.MethodtypeServerStreaming:
             case MethodType.MethodtypeBidiStreaming:
-                return ", grpc::IServerStreamWriter<" +
-                       ProtoUtils.GetClassName(method.OutputType) + "> responseStream";
+                return $", grpc::IServerStreamWriter<{method.OutputType}> responseStream";
             default:
                 throw new ArgumentOutOfRangeException();
         }

@@ -1,3 +1,4 @@
+using ContractGenerator.Primitives;
 using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
@@ -19,8 +20,8 @@ public partial class Generator
     /// </summary>
     private void GenerateStaticMethodField(MethodDescriptor methodDescriptor)
     {
-        var request = ProtoUtils.GetClassName(methodDescriptor.InputType);
-        var response = ProtoUtils.GetClassName(methodDescriptor.OutputType);
+        var request = methodDescriptor.InputType.GetFullTypeName();
+        var response = methodDescriptor.OutputType.GetFullTypeName();
         _(
             $"static readonly aelf::Method<{request}, {response}> {GetMethodFieldName(methodDescriptor)} = new aelf::Method<{request}, {response}>(");
         DoubleIndented(() =>

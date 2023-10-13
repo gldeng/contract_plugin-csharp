@@ -61,8 +61,8 @@ public class ProtoUtilsTests
         var opt = svc.GetOptions();
         var state = opt.GetExtension(OptionsExtensions.CsharpState);
 
-        // Act: Call the GetClassName method
-        var className = ProtoUtils.GetClassName(svc);
+        // Act: Call the GetFullTypeName method
+        var className = svc.GetFullTypeName();
 
         // Assert: Verify the expected result
         Assert.Equal("global::AElf.Contracts.HelloWorld.HelloWorld", className);
