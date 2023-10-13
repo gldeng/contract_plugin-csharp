@@ -19,7 +19,7 @@ public class ContractContainerGeneratorTests : TestBase
 
         var indentPrinter = new Generator(svc, options);
         indentPrinter.Generate();
-        var contractContainerCodeStr = indentPrinter.PrintOut();
+        var contractContainerCodeStr = indentPrinter.Output();
         const string expectedContainerCodeStr =
             """
             public static partial class HelloWorldContainer
@@ -95,7 +95,7 @@ public class ContractContainerGeneratorTests : TestBase
 
         var indentPrinter = new Generator(svc, new GeneratorOptions());
         indentPrinter.GenerateContractBaseClass();
-        var contractBaseCodeStr = indentPrinter.PrintOut();
+        var contractBaseCodeStr = indentPrinter.Output();
         const string expectedCodeStr =
             """
             /// <summary>Base class for the contract of ContractWithBasesBase</summary>

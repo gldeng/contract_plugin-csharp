@@ -68,7 +68,11 @@ public class IndentPrinter
         }
     }
 
-    public string PrintOut()
+    /// <summary>
+    /// Retrieves the content written so far.
+    /// </summary>
+    /// <returns>The content written so far.</returns>
+    public string Output()
     {
         return _stringBuilder.ToString();
     }

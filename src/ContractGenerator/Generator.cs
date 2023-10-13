@@ -60,7 +60,7 @@ public partial class Generator : AbstractGenerator
                 GenerateReferenceClass();
             }
         });
-        return PrintOut();
+        return Output();
     }
 
     private void GenerateAllServiceDescriptorsProperty()

@@ -31,7 +31,7 @@ public class EventTypeGenerator : AbstractGenerator
                 GetNonIndexed();
             }
         );
-        return PrintOut();
+        return Output();
     }
 
     private void GetIndexed()

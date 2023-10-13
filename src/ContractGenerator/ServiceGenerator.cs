@@ -64,7 +64,7 @@ public class ServiceGenerator : AbstractGenerator
             });
         });
 
-        return PrintOut();
+        return Output();
     }
 
     private void Events()

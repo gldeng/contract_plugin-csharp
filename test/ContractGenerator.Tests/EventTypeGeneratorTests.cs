@@ -13,7 +13,7 @@ public class EventTypeGeneratorTests : TestBase
             GenerateEvent = true
         });
         indentPrinter.Generate();
-        var eventCodeStr = indentPrinter.PrintOut();
+        var eventCodeStr = indentPrinter.Output();
         const string expectedCodeStr =
             """
             public partial class UpdatedMessage : aelf::IEvent<UpdatedMessage>
