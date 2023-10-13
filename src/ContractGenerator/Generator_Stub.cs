@@ -4,9 +4,11 @@ namespace ContractGenerator;
 
 public partial class Generator
 {
+    private string StubClassName => _serviceDescriptor.Name + "Stub";
+
     private void GenerateStubClass()
     {
-        _($"public class {GetStubClassName()} : aelf::ContractStubBase");
+        _($"public class {StubClassName} : aelf::ContractStubBase");
         InBlock(() =>
         {
             foreach (var method in FullMethods)
@@ -17,10 +19,5 @@ public partial class Generator
                 ___EmptyLine___();
             }
         });
-    }
-
-    private string GetStubClassName()
-    {
-        return _serviceDescriptor.Name + "Stub";
     }
 }

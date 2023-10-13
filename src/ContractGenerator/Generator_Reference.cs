@@ -4,12 +4,14 @@ namespace ContractGenerator;
 
 public partial class Generator
 {
+    private string ReferenceClassName => _serviceDescriptor.Name + "ReferenceState";
+
     /// <summary>
     ///     Generates the Class for the ReferenceState as part of the aelf contract
     /// </summary>
     protected internal void GenerateReferenceClass()
     {
-        _($"public class {GetReferenceClassName()} : global::AElf.Sdk.CSharp.State.ContractReferenceState");
+        _($"public class {ReferenceClassName} : global::AElf.Sdk.CSharp.State.ContractReferenceState");
         InBlock(() =>
         {
             foreach (var method in FullMethods)
@@ -20,10 +22,5 @@ public partial class Generator
                     $"{PublicOrInternal} global::AElf.Sdk.CSharp.State.MethodReference<{request}, {response}> {method.Name} {{ get; set; }}");
             }
         });
-    }
-
-    private string GetReferenceClassName()
-    {
-        return _serviceDescriptor.Name + "ReferenceState";
     }
 }
