@@ -6,7 +6,16 @@ namespace ContractGenerator;
 public partial class Generator : AbstractGenerator
 {
     private const string ServiceFieldName = "__ServiceName";
-    private ServiceDescriptor _serviceDescriptor;
+    private readonly ServiceDescriptor _serviceDescriptor;
+
+    private string PublicOrInternal => Options.InternalAccess ? "internal" : "public";
+
+    private string ServiceContainerClassName => $"{_serviceDescriptor.Name}Container";
+    private IEnumerable<ServiceDescriptor> FullServices => _serviceDescriptor.GetFullService();
+
+    private IEnumerable<MethodDescriptor> FullMethods =>
+        _serviceDescriptor.GetFullService().SelectMany(serviceItem => serviceItem.Methods).ToList();
+
 
     public Generator(ServiceDescriptor serviceDescriptor, GeneratorOptions options) : base(options)
     {
@@ -19,10 +28,10 @@ public partial class Generator : AbstractGenerator
     public override string? Generate()
     {
         // GenerateDocCommentBody(serviceDescriptor,)
-        PrintLine($"{AccessLevel} static partial class {ServiceContainerClassName}");
+        _($"{PublicOrInternal} static partial class {ServiceContainerClassName}");
         InBlock(() =>
         {
-            PrintLine($"""static readonly string {ServiceFieldName} = "{_serviceDescriptor.FullName}";""");
+            _($"""static readonly string {ServiceFieldName} = "{_serviceDescriptor.FullName}";""");
 
             ___EmptyLine___();
             Marshallers();
@@ -56,23 +65,22 @@ public partial class Generator : AbstractGenerator
 
     private void GenerateAllServiceDescriptorsProperty()
     {
-        PrintLine(
+        _(
             "public static global::System.Collections.Generic.IReadOnlyList<global::Google.Protobuf.Reflection.ServiceDescriptor> Descriptors"
         );
         InBlock(() =>
         {
-            PrintLine("get");
+            _("get");
             InBlock(() =>
             {
-                PrintLine(
+                _(
                     "return new global::System.Collections.Generic.List<global::Google.Protobuf.Reflection.ServiceDescriptor>()");
                 InBlockWithSemicolon(() =>
                 {
-                    var services = _serviceDescriptor.GetFullService();
-                    foreach (var service in services)
+                    foreach (var service in FullServices)
                     {
                         var index = service.Index.ToString();
-                        PrintLine(
+                        _(
                             $"{ProtoUtils.GetReflectionClassName(service.File)}.Descriptor.Services[{index}],");
                     }
                 });
@@ -90,28 +98,28 @@ public partial class Generator : AbstractGenerator
     /// </summary>
     private void Marshallers()
     {
-        PrintLine("#region Marshallers");
-        var usedMessages = GetUsedMessages();
-        foreach (var usedMessage in usedMessages)
+        InRegion("Marshallers", () =>
         {
-            var fieldName = GetMarshallerFieldName(usedMessage);
-            var t = ProtoUtils.GetClassName(usedMessage);
-            PrintLine(
-                $"static readonly aelf::Marshaller<{t}> {fieldName} = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), {t}.Parser.ParseFrom);");
-        }
-
-        PrintLine("#endregion");
+            var usedMessages = GetUsedMessages();
+            foreach (var usedMessage in usedMessages)
+            {
+                var fieldName = GetMarshallerFieldName(usedMessage);
+                var t = ProtoUtils.GetClassName(usedMessage);
+                _(
+                    $"static readonly aelf::Marshaller<{t}> {fieldName} = aelf::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), {t}.Parser.ParseFrom);");
+            }
+        });
     }
 
 
     private void GenerateServiceDescriptorProperty()
     {
-        PrintLine(
+        _(
             "public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor");
-        PrintLine("{");
-        PrintLine(
+        _("{");
+        _(
             $"  get {{ return {ProtoUtils.GetReflectionClassName(_serviceDescriptor.File)}.Descriptor.Services[{_serviceDescriptor.Index}]; }}");
-        PrintLine("}");
+        _("}");
     }
 
 
@@ -124,11 +132,6 @@ public partial class Generator : AbstractGenerator
     {
         var msgFullName = message.FullName;
         return "__Marshaller_" + msgFullName.Replace(".", "_");
-    }
-
-    private List<MethodDescriptor> GetFullMethod()
-    {
-        return _serviceDescriptor.GetFullService().SelectMany(serviceItem => serviceItem.Methods).ToList();
     }
 
     private static string GetMethodFieldName(MethodDescriptor method)
@@ -157,8 +160,7 @@ public partial class Generator : AbstractGenerator
         var descriptorSet = new HashSet<IDescriptor>();
         var result = new List<IDescriptor>();
 
-        var methods = GetFullMethod();
-        foreach (var method in methods)
+        foreach (var method in FullMethods)
         {
             if (!descriptorSet.Contains(method.InputType))
             {
@@ -182,8 +184,4 @@ public partial class Generator : AbstractGenerator
         MethodtypeServerStreaming,
         MethodtypeBidiStreaming
     }
-
-    private string AccessLevel => Options.InternalAccess ? "internal" : "public";
-
-    private string ServiceContainerClassName => $"{_serviceDescriptor.Name}Container";
 }

@@ -7,7 +7,7 @@ public class IndentPrinterTests
     {
         var indentPrinter = new IndentPrinter();
         indentPrinter.Indent();
-        indentPrinter.PrintLine("test func()");
+        indentPrinter._("test func()");
         var outputCode = indentPrinter.PrintOut();
         Assert.Equal("  test func()\n", outputCode);
     }
@@ -17,13 +17,13 @@ public class IndentPrinterTests
     {
         var indentPrinter = new IndentPrinter();
         indentPrinter.Indent();
-        indentPrinter.PrintLine("test func(){");
+        indentPrinter._("test func(){");
         indentPrinter.Indent();
-        indentPrinter.PrintLine("var someFields = new SomeField();");
+        indentPrinter._("var someFields = new SomeField();");
         indentPrinter.Outdent();
-        indentPrinter.PrintLine("}");
+        indentPrinter._("}");
         indentPrinter.Outdent();
-        indentPrinter.PrintLine("//done");
+        indentPrinter._("//done");
         var outputCode = indentPrinter.PrintOut();
         Assert.Equal("  test func(){\n    var someFields = new SomeField();\n  }\n//done\n", outputCode);
     }
@@ -34,12 +34,12 @@ public class IndentPrinterTests
         // Arrange: Set up your test scenario
         var indentPrinter = new IndentPrinter();
         indentPrinter.Indent();
-        indentPrinter.PrintLine("test func()");
+        indentPrinter._("test func()");
         indentPrinter.Outdent();
         var action = () => indentPrinter.Outdent();
         // Act & Assert: Use Assert.Throws to assert that an exception is thrown
-        var exception = Assert.Throws<Exception>(action);
+        var exception = Assert.Throws<InvalidOperationException>(action);
 
-        Assert.Equal("nothing left to outdent", exception.Message);
+        Assert.Equal("No more indentation to reduce.", exception.Message);
     }
 }

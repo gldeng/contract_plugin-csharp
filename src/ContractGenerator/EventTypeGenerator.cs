@@ -5,21 +5,25 @@ namespace ContractGenerator;
 
 public class EventTypeGenerator : AbstractGenerator
 {
+    private string PublicOrInternal => Options.InternalAccess ? "internal" : "public";
     private readonly MessageDescriptor _messageDescriptor;
-    private readonly GeneratorOptions _options;
+    private string TypeName => _messageDescriptor.Name;
+
+    private IEnumerable<FieldDescriptor> IndexedFields =>
+        _messageDescriptor.Fields.InFieldNumberOrder().Where(f => f.IndexedField()).ToList();
+
+    private IEnumerable<FieldDescriptor> NonIndexedFields =>
+        _messageDescriptor.Fields.InFieldNumberOrder().Where(f => f.NonIndexedField()).ToList();
 
     public EventTypeGenerator(MessageDescriptor message, GeneratorOptions options) : base(options)
     {
         _messageDescriptor = message;
-        _options = options;
     }
 
     public override string? Generate()
     {
         if (!_messageDescriptor.IsEventMessageType()) return null;
-        var accessLevel = _options.GetAccessLevel();
-        var typeName = _messageDescriptor.Name;
-        PrintLine($"{accessLevel} partial class {typeName} : aelf::IEvent<{typeName}>");
+        _($"{PublicOrInternal} partial class {TypeName} : aelf::IEvent<{TypeName}>");
         InBlock(() =>
             {
                 GetIndexed();
@@ -32,21 +36,20 @@ public class EventTypeGenerator : AbstractGenerator
 
     private void GetIndexed()
     {
-        PrintLine(
-            $"public global::System.Collections.Generic.IEnumerable<{_messageDescriptor.Name}> GetIndexed()");
+        _(
+            $"public global::System.Collections.Generic.IEnumerable<{TypeName}> GetIndexed()");
         InBlock(() =>
         {
-            PrintLine($"return new List<{_messageDescriptor.Name}>");
+            _($"return new List<{TypeName}>");
             InBlockWithSemicolon(() =>
             {
-                var fields = _messageDescriptor.Fields.InFieldNumberOrder();
-                foreach (var field in fields.Where(f => f.IndexedField()))
+                foreach (var field in IndexedFields)
                 {
-                    PrintLine($"new {_messageDescriptor.Name}");
+                    _($"new {TypeName}");
                     InBlockWithComma(() =>
                     {
                         var propertyName = field.GetPropertyName();
-                        PrintLine($"{propertyName} = {propertyName}");
+                        _($"{propertyName} = {propertyName}");
                     });
                 }
             });
@@ -55,17 +58,16 @@ public class EventTypeGenerator : AbstractGenerator
 
     private void GetNonIndexed()
     {
-        PrintLine($"public {_messageDescriptor.Name} GetNonIndexed()");
+        _($"public {TypeName} GetNonIndexed()");
         InBlock(() =>
         {
-            PrintLine($"return new {_messageDescriptor.Name}");
+            _($"return new {TypeName}");
             InBlockWithSemicolon(() =>
             {
-                var fields = _messageDescriptor.Fields.InFieldNumberOrder();
-                foreach (var field in fields.Where(f => f.NonIndexedField()))
+                foreach (var field in NonIndexedFields)
                 {
                     var propertyName = field.GetPropertyName();
-                    PrintLine($"{propertyName} = {propertyName},");
+                    _($"{propertyName} = {propertyName},");
                 }
             });
         });

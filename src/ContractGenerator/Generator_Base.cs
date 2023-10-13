@@ -12,42 +12,35 @@ public partial class Generator
     protected internal void GenerateContractBaseClass()
     {
         var serverClassName = GetServerClassName();
-        PrintLine(
+        _(
             $"/// <summary>Base class for the contract of {serverClassName}</summary>");
-        PrintLine(
+        _(
             $"public abstract partial class {serverClassName} : AElf.Sdk.CSharp.CSharpSmartContract<{GetStateTypeName()}>");
         InBlock(() =>
         {
-            var methods = GetFullMethod();
-            foreach (var method in methods)
-                PrintLine(
+            foreach (var method in FullMethods)
+                _(
                     $"public abstract {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)});");
         });
     }
 
     private void GenerateBindServiceMethod()
     {
-        PrintLine(
-            $"public static aelf::ServerServiceDefinition BindService({GetServerClassName()} serviceImpl)");
+        _($"public static aelf::ServerServiceDefinition BindService({GetServerClassName()} serviceImpl)");
         InBlock(() =>
         {
-            PrintLine("return aelf::ServerServiceDefinition.CreateBuilder()");
-            Indent();
-            Indent();
-            PrintLine(".AddDescriptors(Descriptors)");
-            var methods = GetFullMethod();
-            foreach (var method in methods.SkipLast(1))
+            _("return aelf::ServerServiceDefinition.CreateBuilder()");
+            DoubleIndented(() =>
             {
-                PrintLine(
-                    $".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name})");
-            }
+                _(".AddDescriptors(Descriptors)");
+                foreach (var method in FullMethods.SkipLast(1))
+                {
+                    _($".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name})");
+                }
 
-            var lastMethod = methods.Last();
-            PrintLine(
-                $".AddMethod({GetMethodFieldName(lastMethod)}, serviceImpl.{lastMethod.Name}).Build();");
-
-            Outdent();
-            Outdent();
+                var lastMethod = FullMethods.Last();
+                _($".AddMethod({GetMethodFieldName(lastMethod)}, serviceImpl.{lastMethod.Name}).Build();");
+            });
         });
         ___EmptyLine___();
     }

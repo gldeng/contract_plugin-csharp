@@ -4,28 +4,17 @@ public partial class Generator
 {
     private void GenerateStubClass()
     {
-        PrintLine($"public class {GetStubClassName()} : aelf::ContractStubBase");
-        PrintLine("{");
+        _($"public class {GetStubClassName()} : aelf::ContractStubBase");
+        InBlock(() =>
         {
-            Indent();
-            var methods = GetFullMethod();
-            foreach (var method in methods)
+            foreach (var method in FullMethods)
             {
-                PrintLine(
+                _(
                     $"public aelf::IMethodStub<{ProtoUtils.GetClassName(method.InputType)}, {ProtoUtils.GetClassName(method.OutputType)}> {method.Name}");
-                PrintLine("{");
-                {
-                    Indent();
-                    PrintLine($"get {{ return __factory.Create({GetMethodFieldName(method)}); }}");
-                    Outdent();
-                }
-                PrintLine("}");
+                InBlock(() => { _($"get {{ return __factory.Create({GetMethodFieldName(method)}); }}"); });
                 ___EmptyLine___();
             }
-
-            Outdent();
-        }
-        PrintLine("}");
+        });
     }
 
     private string GetStubClassName()

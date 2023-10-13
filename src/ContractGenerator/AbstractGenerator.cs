@@ -9,39 +9,79 @@ public abstract class AbstractGenerator : IndentPrinter
         Options = options;
     }
 
-    protected void InRegion(string name, Action a)
+    /// <summary>
+    /// Enclose the content written in <paramref name="action"/> with a <c>#region</c> <c>#endregion</c> block.
+    /// </summary>
+    /// <param name="action">The action to be executed within the block. Use it to code the logic for content to be
+    /// written within the block.</param>
+    protected void InRegion(string name, Action action)
     {
-        PrintLine($"#region {name}");
-        a();
-        PrintLine($"#endregion {name}");
+        _($"#region {name}");
+        action();
+        _($"#endregion {name}");
     }
 
-    protected void InBlock(Action a)
+    /// <summary>
+    /// Enclose the content written in <paramref name="action"/> with a pair of braces. The content written in
+    /// <paramref name="action"/> will be indented.
+    /// </summary>
+    /// <param name="action">The action to be executed within the block. Use it to code the logic for content to be
+    /// written within the block.</param>
+    protected void InBlock(Action action)
     {
-        PrintLine("{");
+        _("{");
+        Indent();
+        action();
+        Outdent();
+        _("}");
+    }
+
+    /// <summary>
+    /// Enclose the content written in <paramref name="action"/> with a pair of braces. The content written in
+    /// <paramref name="action"/> will be indented. This method is similar to <see cref="InBlock"/> except that an
+    /// additional <c>;</c> is written after the closing brace.
+    /// </summary>
+    /// <param name="action">The action to be executed within the block. Use it to code the logic for content to be
+    /// written within the block.</param>
+    protected void InBlockWithSemicolon(Action action)
+    {
+        _("{");
+        Indent();
+        action();
+        Outdent();
+        _("};");
+    }
+
+    /// <summary>
+    /// Enclose the content written in <paramref name="action"/> with a pair of braces. The content written in
+    /// <paramref name="action"/> will be indented. This method is similar to <see cref="InBlock"/> except that an
+    /// additional <c>,</c> is written after the closing brace.
+    /// </summary>
+    /// <param name="action">The action to be executed within the block. Use it to code the logic for content to be
+    /// written within the block.</param>
+    protected void InBlockWithComma(Action action)
+    {
+        _("{");
+        Indent();
+        action();
+        Outdent();
+        _("};");
+    }
+
+    protected void Indented(Action a)
+    {
         Indent();
         a();
         Outdent();
-        PrintLine("}");
     }
 
-    protected void InBlockWithSemicolon(Action a)
+    protected void DoubleIndented(Action a)
     {
-        PrintLine("{");
+        Indent();
         Indent();
         a();
         Outdent();
-        PrintLine("};");
-    }
-
-    protected void InBlockWithComma(Action a)
-    {
-        PrintLine("{");
-        Indent();
-        a();
         Outdent();
-        PrintLine("};");
     }
-
     public abstract string? Generate();
 }

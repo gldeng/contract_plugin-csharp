@@ -10,7 +10,7 @@ public partial class Generator
     {
         InRegion("Methods", () =>
         {
-            foreach (var method in GetFullMethod()) GenerateStaticMethodField(method);
+            foreach (var method in FullMethods) GenerateStaticMethodField(method);
         });
     }
 
@@ -21,19 +21,17 @@ public partial class Generator
     {
         var request = ProtoUtils.GetClassName(methodDescriptor.InputType);
         var response = ProtoUtils.GetClassName(methodDescriptor.OutputType);
-        PrintLine(
-            $"static readonly aelf::Method<{request}, {response}> {GetMethodFieldName(methodDescriptor)} = new " +
-            $"aelf::Method<{request}, {response}>(");
-        Indent();
-        Indent();
-        PrintLine($"{GetCSharpMethodType(methodDescriptor)},");
-        PrintLine($"{ServiceFieldName},");
-        PrintLine($"\"{methodDescriptor.Name}\",");
-        PrintLine($"{GetMarshallerFieldName(methodDescriptor.InputType)},");
-        PrintLine($"{GetMarshallerFieldName(methodDescriptor.OutputType)});");
+        _(
+            $"static readonly aelf::Method<{request}, {response}> {GetMethodFieldName(methodDescriptor)} = new aelf::Method<{request}, {response}>(");
+        DoubleIndented(() =>
+        {
+            _($"{GetCSharpMethodType(methodDescriptor)},");
+            _($"{ServiceFieldName},");
+            _($"\"{methodDescriptor.Name}\",");
+            _($"{GetMarshallerFieldName(methodDescriptor.InputType)},");
+            _($"{GetMarshallerFieldName(methodDescriptor.OutputType)});");
+        });
         ___EmptyLine___();
-        Outdent();
-        Outdent();
     }
 
     #endregion Methods

@@ -9,16 +9,15 @@ public partial class Generator
     /// </summary>
     protected internal void GenerateReferenceClass()
     {
-        PrintLine($"public class {GetReferenceClassName()} : global::AElf.Sdk.CSharp.State.ContractReferenceState");
+        _($"public class {GetReferenceClassName()} : global::AElf.Sdk.CSharp.State.ContractReferenceState");
         InBlock(() =>
         {
-            var methods = GetFullMethod();
-            foreach (var method in methods)
+            foreach (var method in FullMethods)
             {
                 var request = ProtoUtils.GetClassName(method.InputType);
                 var response = ProtoUtils.GetClassName(method.OutputType);
-                PrintLine(
-                    $"{Options.GetAccessLevel()} global::AElf.Sdk.CSharp.State.MethodReference<{request}, {response}> {method.Name} {{ get; set; }}");
+                _(
+                    $"{PublicOrInternal} global::AElf.Sdk.CSharp.State.MethodReference<{request}, {response}> {method.Name} {{ get; set; }}");
             }
         });
     }

@@ -7,21 +7,33 @@ public class IndentPrinter
     private readonly StringBuilder _stringBuilder = new();
     private int _indents;
 
+    /// <summary>
+    /// Increase the indentation for all content written afterwards.
+    /// </summary>
     public void Indent()
     {
         _indents++;
     }
 
+    /// <summary>
+    /// Reduce the indentation for all content written afterwards.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">If there's not current indentation, calling this method will cause
+    /// an exception to be thrown.</exception>
     public void Outdent()
     {
-        if (_indents == 0) throw new Exception("nothing left to outdent");
+        if (_indents == 0) throw new InvalidOperationException("No more indentation to reduce.");
 
         _indents--;
     }
 
+    /// <summary>
+    /// Prints an empty line.
+    /// </summary>
+    /// <remarks>The name <c>___EmptyLine___</c> is used so that it's easy to see from code.</remarks>
     public void ___EmptyLine___()
     {
-        PrintLine(String.Empty);
+        _(String.Empty);
     }
 
     public void Print(string str)
@@ -42,9 +54,14 @@ public class IndentPrinter
         Print(str);
     }
 
-    public void PrintLine(string str)
+    /// <summary>
+    /// Prints a line.
+    /// </summary>
+    /// <param name="content">Content to be printed. A new line will be appended at the end.</param>
+    /// <remarks>The name <c>_</c> is used so that it won't distract readers from the content being printed.</remarks>
+    public void _(string content)
     {
-        var lines = str.Split(Environment.NewLine);
+        var lines = content.Split(Environment.NewLine);
         foreach (var line in lines)
         {
             PrintOneLine(line);
