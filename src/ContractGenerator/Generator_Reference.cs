@@ -7,7 +7,7 @@ public partial class Generator
     /// <summary>
     ///     Generates the Class for the ReferenceState as part of the aelf contract
     /// </summary>
-    private void GenerateReferenceClass()
+    protected internal void GenerateReferenceClass()
     {
         PrintLine($"public class {GetReferenceClassName()} : global::AElf.Sdk.CSharp.State.ContractReferenceState");
         InBlock(() =>

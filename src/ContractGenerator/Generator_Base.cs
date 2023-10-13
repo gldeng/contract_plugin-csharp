@@ -25,6 +25,35 @@ public partial class Generator
         });
     }
 
+    private void GenerateBindServiceMethod()
+    {
+        PrintLine(
+            $"public static aelf::ServerServiceDefinition BindService({GetServerClassName()} serviceImpl)");
+        InBlock(() =>
+        {
+            PrintLine("return aelf::ServerServiceDefinition.CreateBuilder()");
+            Indent();
+            Indent();
+            PrintLine(".AddDescriptors(Descriptors)");
+            var methods = GetFullMethod();
+            foreach (var method in methods.SkipLast(1))
+            {
+                PrintLine(
+                    $".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name})");
+            }
+
+            var lastMethod = methods.Last();
+            PrintLine(
+                $".AddMethod({GetMethodFieldName(lastMethod)}, serviceImpl.{lastMethod.Name}).Build();");
+
+            Outdent();
+            Outdent();
+        });
+        PrintLine();
+    }
+
+    #region Helper Methods
+
     private string GetStateTypeName()
     {
         return _serviceDescriptor.GetOptions().GetExtension(OptionsExtensions.CsharpState);
@@ -76,31 +105,5 @@ public partial class Generator
         return method.IsServerStreaming ? MethodType.MethodtypeServerStreaming : MethodType.MethodtypeNoStreaming;
     }
 
-
-    private void GenerateBindServiceMethod()
-    {
-        PrintLine(
-            $"public static aelf::ServerServiceDefinition BindService({GetServerClassName()} serviceImpl)");
-        InBlock(() =>
-        {
-            PrintLine("return aelf::ServerServiceDefinition.CreateBuilder()");
-            Indent();
-            Indent();
-            PrintLine(".AddDescriptors(Descriptors)");
-            var methods = GetFullMethod();
-            foreach (var method in methods.SkipLast(1))
-            {
-                PrintLine(
-                    $".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name})");
-            }
-
-            var lastMethod = methods.Last();
-            PrintLine(
-                $".AddMethod({GetMethodFieldName(lastMethod)}, serviceImpl.{lastMethod.Name}).Build();");
-
-            Outdent();
-            Outdent();
-        });
-        PrintLine();
-    }
+    #endregion
 }
