@@ -45,17 +45,17 @@ public class ServiceGenerator : AbstractGenerator
         // }
 
         PrintLine("#pragma warning disable 0414, 1591");
-        PrintLine();
+        ___EmptyLine___();
 
         InRegion("Designer generated code", () =>
         {
-            PrintLine();
+            ___EmptyLine___();
             PrintLine(
                 """
                 using System.Collections.Generic;
                 using aelf = global::AElf.CSharp.Core;
                 """);
-            PrintLine();
+            ___EmptyLine___();
             Print($"namespace {_fileDescriptor.GetNamespace()} ");
             InBlock(() =>
             {
@@ -71,7 +71,7 @@ public class ServiceGenerator : AbstractGenerator
     {
         if (!Options.GenerateEvent) return;
         // Events are not needed for contract reference
-        PrintLine();
+        ___EmptyLine___();
         InRegion("Events", () =>
         {
             foreach (var msg in _fileDescriptor.MessageTypes)
@@ -79,7 +79,7 @@ public class ServiceGenerator : AbstractGenerator
                 PrintIgnoreWhitespace(new EventTypeGenerator(msg, Options).Generate());
             }
         });
-        PrintLine();
+        ___EmptyLine___();
     }
 
     private void ContractContainer()

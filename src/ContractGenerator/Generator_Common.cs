@@ -31,7 +31,7 @@ public partial class Generator
         PrintLine($"\"{methodDescriptor.Name}\",");
         PrintLine($"{GetMarshallerFieldName(methodDescriptor.InputType)},");
         PrintLine($"{GetMarshallerFieldName(methodDescriptor.OutputType)});");
-        PrintLine();
+        ___EmptyLine___();
         Outdent();
         Outdent();
     }
@@ -45,7 +45,7 @@ public partial class Generator
         InRegion("Descriptors", () =>
         {
             GenerateServiceDescriptorProperty();
-            PrintLine();
+            ___EmptyLine___();
             GenerateAllServiceDescriptorsProperty();
         });
     }

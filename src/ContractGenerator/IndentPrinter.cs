@@ -19,7 +19,7 @@ public class IndentPrinter
         _indents--;
     }
 
-    public void PrintLine()
+    public void ___EmptyLine___()
     {
         PrintLine(String.Empty);
     }

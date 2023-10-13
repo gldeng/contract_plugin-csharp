@@ -20,7 +20,7 @@ public partial class Generator
                     Outdent();
                 }
                 PrintLine("}");
-                PrintLine();
+                ___EmptyLine___();
             }
 
             Outdent();

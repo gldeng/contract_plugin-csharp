@@ -24,30 +24,30 @@ public partial class Generator : AbstractGenerator
         {
             PrintLine($"""static readonly string {ServiceFieldName} = "{_serviceDescriptor.FullName}";""");
 
-            PrintLine();
+            ___EmptyLine___();
             Marshallers();
-            PrintLine();
+            ___EmptyLine___();
             Methods();
-            PrintLine();
+            ___EmptyLine___();
             Descriptors();
 
             if (Options.GenerateContract)
             {
-                PrintLine();
+                ___EmptyLine___();
                 GenerateContractBaseClass();
-                PrintLine();
+                ___EmptyLine___();
                 GenerateBindServiceMethod();
             }
 
             if (Options.GenerateStub)
             {
-                PrintLine();
+                ___EmptyLine___();
                 GenerateStubClass();
             }
 
             if (Options.GenerateReference)
             {
-                PrintLine();
+                ___EmptyLine___();
                 GenerateReferenceClass();
             }
         });

@@ -23,7 +23,7 @@ public class EventTypeGenerator : AbstractGenerator
         InBlock(() =>
             {
                 GetIndexed();
-                PrintLine();
+                ___EmptyLine___();
                 GetNonIndexed();
             }
         );

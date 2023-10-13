@@ -49,7 +49,7 @@ public partial class Generator
             Outdent();
             Outdent();
         });
-        PrintLine();
+        ___EmptyLine___();
     }
 
     #region Helper Methods
