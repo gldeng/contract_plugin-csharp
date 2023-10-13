@@ -3,7 +3,7 @@ using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
 
-public class EventTypeGenerator : GeneratorBase
+public class EventTypeGenerator : AbstractGenerator
 {
     private readonly MessageDescriptor _messageDescriptor;
     private readonly GeneratorOptions _options;

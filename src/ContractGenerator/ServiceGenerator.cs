@@ -3,7 +3,7 @@ using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
 
-public class ServiceGenerator : GeneratorBase
+public class ServiceGenerator : AbstractGenerator
 {
     private GeneratorOptions _options;
     private FileDescriptor _fileDescriptor;

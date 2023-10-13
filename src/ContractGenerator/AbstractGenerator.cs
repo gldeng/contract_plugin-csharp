@@ -1,6 +1,6 @@
 namespace ContractGenerator;
 
-public abstract class GeneratorBase : IndentPrinter
+public abstract class AbstractGenerator : IndentPrinter
 {
     protected void InRegion(string name, Action a)
     {

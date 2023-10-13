@@ -3,7 +3,7 @@ using Google.Protobuf.Reflection;
 
 namespace ContractGenerator;
 
-public partial class Generator : GeneratorBase
+public partial class Generator : AbstractGenerator
 {
     private const string ServiceFieldName = "__ServiceName";
     private GeneratorOptions _options;
