@@ -5,13 +5,11 @@ namespace ContractGenerator;
 
 public class ServiceGenerator : AbstractGenerator
 {
-    private GeneratorOptions _options;
     private FileDescriptor _fileDescriptor;
 
-    public ServiceGenerator(FileDescriptor fileDescriptor, GeneratorOptions options)
+    public ServiceGenerator(FileDescriptor fileDescriptor, GeneratorOptions options) : base(options)
     {
         _fileDescriptor = fileDescriptor;
-        _options = options;
     }
 
     public override string? Generate()
@@ -28,7 +26,7 @@ public class ServiceGenerator : AbstractGenerator
 
         // Don't write out any output if there no event for event-only generation
         // scenario, this is usually for base contracts
-        if (_options.GenerateEventOnly && !_fileDescriptor.ContainsEvent()) return "";
+        if (Options.GenerateEventOnly && !_fileDescriptor.ContainsEvent()) return "";
 
         // Write out a file header.
         PrintLine(
@@ -71,14 +69,14 @@ public class ServiceGenerator : AbstractGenerator
 
     private void Events()
     {
-        if (!_options.GenerateEvent) return;
+        if (!Options.GenerateEvent) return;
         // Events are not needed for contract reference
         PrintLine();
         InRegion("Events", () =>
         {
             foreach (var msg in _fileDescriptor.MessageTypes)
             {
-                PrintIgnoreWhitespace(new EventTypeGenerator(msg, _options).Generate());
+                PrintIgnoreWhitespace(new EventTypeGenerator(msg, Options).Generate());
             }
         });
         PrintLine();
@@ -86,10 +84,10 @@ public class ServiceGenerator : AbstractGenerator
 
     private void ContractContainer()
     {
-        if (!_options.GenerateContainer) return;
+        if (!Options.GenerateContainer) return;
         foreach (var svc in _fileDescriptor.Services)
         {
-            PrintIgnoreWhitespace(new Generator(svc, _options).Generate());
+            PrintIgnoreWhitespace(new Generator(svc, Options).Generate());
         }
     }
 }

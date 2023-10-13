@@ -18,7 +18,7 @@ public partial class Generator
                 var request = ProtoUtils.GetClassName(method.InputType);
                 var response = ProtoUtils.GetClassName(method.OutputType);
                 PrintLine(
-                    $"{_options.GetAccessLevel()} global::AElf.Sdk.CSharp.State.MethodReference<{request}, {response}> {method.Name} {{ get; set; }}");
+                    $"{Options.GetAccessLevel()} global::AElf.Sdk.CSharp.State.MethodReference<{request}, {response}> {method.Name} {{ get; set; }}");
             }
         });
     }

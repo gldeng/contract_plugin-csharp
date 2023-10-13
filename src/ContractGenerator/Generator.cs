@@ -6,13 +6,11 @@ namespace ContractGenerator;
 public partial class Generator : AbstractGenerator
 {
     private const string ServiceFieldName = "__ServiceName";
-    private GeneratorOptions _options;
     private ServiceDescriptor _serviceDescriptor;
 
-    public Generator(ServiceDescriptor serviceDescriptor, GeneratorOptions options)
+    public Generator(ServiceDescriptor serviceDescriptor, GeneratorOptions options) : base(options)
     {
         _serviceDescriptor = serviceDescriptor;
-        _options = options;
     }
 
     /// <summary>
@@ -22,38 +20,37 @@ public partial class Generator : AbstractGenerator
     {
         // GenerateDocCommentBody(serviceDescriptor,)
         PrintLine($"{AccessLevel} static partial class {ServiceContainerClassName}");
-        PrintLine("{");
-        Indent();
-        PrintLine($"""static readonly string {ServiceFieldName} = "{_serviceDescriptor.FullName}";""");
-
-        PrintLine();
-        Marshallers();
-        PrintLine();
-        Methods();
-        PrintLine();
-        Descriptors();
-
-        if (_options.GenerateContract)
+        InBlock(() =>
         {
-            PrintLine();
-            GenerateContractBaseClass();
-            PrintLine();
-            GenerateBindServiceMethod();
-        }
+            PrintLine($"""static readonly string {ServiceFieldName} = "{_serviceDescriptor.FullName}";""");
 
-        if (_options.GenerateStub)
-        {
             PrintLine();
-            GenerateStubClass();
-        }
+            Marshallers();
+            PrintLine();
+            Methods();
+            PrintLine();
+            Descriptors();
 
-        if (_options.GenerateReference)
-        {
-            PrintLine();
-            GenerateReferenceClass();
-        }
-        Outdent();
-        PrintLine("}");
+            if (Options.GenerateContract)
+            {
+                PrintLine();
+                GenerateContractBaseClass();
+                PrintLine();
+                GenerateBindServiceMethod();
+            }
+
+            if (Options.GenerateStub)
+            {
+                PrintLine();
+                GenerateStubClass();
+            }
+
+            if (Options.GenerateReference)
+            {
+                PrintLine();
+                GenerateReferenceClass();
+            }
+        });
         return PrintOut();
     }
 
@@ -196,7 +193,7 @@ public partial class Generator : AbstractGenerator
         MethodtypeBidiStreaming
     }
 
-    private string AccessLevel => _options.InternalAccess ? "internal" : "public";
+    private string AccessLevel => Options.InternalAccess ? "internal" : "public";
 
     private string ServiceContainerClassName => $"{_serviceDescriptor.Name}Container";
 }

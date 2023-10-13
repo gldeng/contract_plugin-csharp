@@ -2,6 +2,13 @@ namespace ContractGenerator;
 
 public abstract class AbstractGenerator : IndentPrinter
 {
+    protected readonly GeneratorOptions Options;
+
+    protected AbstractGenerator(GeneratorOptions options)
+    {
+        Options = options;
+    }
+
     protected void InRegion(string name, Action a)
     {
         PrintLine($"#region {name}");

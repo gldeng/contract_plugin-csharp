@@ -8,7 +8,7 @@ public class EventTypeGenerator : AbstractGenerator
     private readonly MessageDescriptor _messageDescriptor;
     private readonly GeneratorOptions _options;
 
-    public EventTypeGenerator(MessageDescriptor message, GeneratorOptions options)
+    public EventTypeGenerator(MessageDescriptor message, GeneratorOptions options) : base(options)
     {
         _messageDescriptor = message;
         _options = options;
