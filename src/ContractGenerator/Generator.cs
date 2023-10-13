@@ -27,6 +27,7 @@ public partial class Generator : GeneratorBase
         Indent();
         PrintLine($"""static readonly string {ServiceFieldName} = "{_serviceDescriptor.FullName}";""");
 
+        PrintLine();
         Marshallers();
         PrintLine();
         Methods();
@@ -41,9 +42,17 @@ public partial class Generator : GeneratorBase
             GenerateBindServiceMethod();
         }
 
-        if (_options.GenerateStub) GenerateStubClass();
+        if (_options.GenerateStub)
+        {
+            PrintLine();
+            GenerateStubClass();
+        }
 
-        if (_options.GenerateReference) GenerateReferenceClass();
+        if (_options.GenerateReference)
+        {
+            PrintLine();
+            GenerateReferenceClass();
+        }
         Outdent();
         PrintLine("}");
         return PrintOut();
