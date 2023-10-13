@@ -23,7 +23,7 @@ public partial class Generator
         var request = ProtoUtils.GetClassName(methodDescriptor.InputType);
         var response = ProtoUtils.GetClassName(methodDescriptor.OutputType);
         PrintLine(
-            $"static readonly aelf::Method<{request}, $response$> {GetMethodFieldName(methodDescriptor)} = new " +
+            $"static readonly aelf::Method<{request}, {response}> {GetMethodFieldName(methodDescriptor)} = new " +
             $"aelf::Method<{request}, {response}>(");
         Indent();
         Indent();

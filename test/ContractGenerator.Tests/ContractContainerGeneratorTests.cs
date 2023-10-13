@@ -31,14 +31,14 @@ public class ContractContainerGeneratorTests : TestBase
               #endregion
 
               #region Methods
-              static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, $response$> __Method_Update = new aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::Google.Protobuf.WellKnownTypes.Empty>(
+              static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::Google.Protobuf.WellKnownTypes.Empty> __Method_Update = new aelf::Method<global::Google.Protobuf.WellKnownTypes.StringValue, global::Google.Protobuf.WellKnownTypes.Empty>(
                   aelf::MethodType.Action,
                   __ServiceName,
                   "Update",
                   __Marshaller_google_protobuf_StringValue,
                   __Marshaller_google_protobuf_Empty);
 
-              static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, $response$> __Method_Read = new aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::Google.Protobuf.WellKnownTypes.StringValue>(
+              static readonly aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::Google.Protobuf.WellKnownTypes.StringValue> __Method_Read = new aelf::Method<global::Google.Protobuf.WellKnownTypes.Empty, global::Google.Protobuf.WellKnownTypes.StringValue>(
                   aelf::MethodType.View,
                   __ServiceName,
                   "Read",
