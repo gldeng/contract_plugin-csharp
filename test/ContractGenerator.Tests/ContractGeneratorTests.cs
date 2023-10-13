@@ -112,7 +112,7 @@ public class ContractGeneratorTests
                 {
                   return aelf::ServerServiceDefinition.CreateBuilder()
                       .AddDescriptors(Descriptors)
-                      .AddMethod(__Method_Update, serviceImpl.Update).Build();
+                      .AddMethod(__Method_Update, serviceImpl.Update)
                       .AddMethod(__Method_Read, serviceImpl.Read).Build();
                 }
 

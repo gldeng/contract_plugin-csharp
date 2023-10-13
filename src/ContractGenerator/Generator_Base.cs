@@ -88,9 +88,16 @@ public partial class Generator
             Indent();
             PrintLine(".AddDescriptors(Descriptors)");
             var methods = GetFullMethod();
-            foreach (var method in methods)
+            foreach (var method in methods.SkipLast(1))
+            {
                 PrintLine(
-                    $".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name}).Build();");
+                    $".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name})");
+            }
+
+            var lastMethod = methods.Last();
+            PrintLine(
+                $".AddMethod({GetMethodFieldName(lastMethod)}, serviceImpl.{lastMethod.Name}).Build();");
+
             Outdent();
             Outdent();
         });
