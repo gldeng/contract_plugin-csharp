@@ -59,18 +59,15 @@ public partial class Generator : AbstractGenerator
         PrintLine(
             "public static global::System.Collections.Generic.IReadOnlyList<global::Google.Protobuf.Reflection.ServiceDescriptor> Descriptors"
         );
-        PrintLine("{");
+        InBlock(() =>
         {
-            Indent();
             PrintLine("get");
-            PrintLine("{");
+            InBlock(() =>
             {
-                Indent();
                 PrintLine(
                     "return new global::System.Collections.Generic.List<global::Google.Protobuf.Reflection.ServiceDescriptor>()");
-                PrintLine("{");
+                InBlockWithSemicolon(() =>
                 {
-                    Indent();
                     var services = _serviceDescriptor.GetFullService();
                     foreach (var service in services)
                     {
@@ -78,16 +75,9 @@ public partial class Generator : AbstractGenerator
                         PrintLine(
                             $"{ProtoUtils.GetReflectionClassName(service.File)}.Descriptor.Services[{index}],");
                     }
-
-                    Outdent();
-                }
-                PrintLine("};");
-                Outdent();
-            }
-            PrintLine("}");
-            Outdent();
-        }
-        PrintLine("}");
+                });
+            });
+        });
     }
 
     private string GetServerClassName()
