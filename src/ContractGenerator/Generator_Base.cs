@@ -36,16 +36,18 @@ public partial class Generator
             Indent();
             PrintLine(".AddDescriptors(Descriptors)");
             var methods = GetFullMethod();
-            foreach (var method in methods.SkipLast(1))
+            if (methods.Count > 0)
             {
+                foreach (var method in methods.SkipLast(1))
+                {
+                    PrintLine(
+                        $".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name})");
+                }
+
+                var lastMethod = methods.Last();
                 PrintLine(
-                    $".AddMethod({GetMethodFieldName(method)}, serviceImpl.{method.Name})");
+                    $".AddMethod({GetMethodFieldName(lastMethod)}, serviceImpl.{lastMethod.Name}).Build();");
             }
-
-            var lastMethod = methods.Last();
-            PrintLine(
-                $".AddMethod({GetMethodFieldName(lastMethod)}, serviceImpl.{lastMethod.Name}).Build();");
-
             Outdent();
             Outdent();
         });
@@ -56,6 +58,11 @@ public partial class Generator
 
     private string GetStateTypeName()
     {
+        // If there has no option (aelf.csharp_state) = "XXX" in proto files, state name will return empty string. Such as base proto.
+        if (_serviceDescriptor.GetOptions() == null)
+        {
+            return "";
+        }
         return _serviceDescriptor.GetOptions().GetExtension(OptionsExtensions.CsharpState);
     }
 
