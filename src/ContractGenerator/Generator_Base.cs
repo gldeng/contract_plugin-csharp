@@ -20,8 +20,21 @@ public partial class Generator
         {
             var methods = GetFullMethod();
             foreach (var method in methods)
-                PrintLine(
-                    $"public abstract {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)});");
+                if (Options.VirtualMethod)
+                {
+                    PrintLine(
+                        $"public virtual {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)})");
+                    PrintLine("{");
+                    Indent();
+                    PrintLine("throw new global::System.NotImplementedException();");
+                    Outdent();
+                    PrintLine("}");
+                }
+                else
+                {
+                    PrintLine(
+                        $"public abstract {GetMethodReturnTypeServer(method)} {method.Name}({GetMethodRequestParamServer(method)}{GetMethodResponseStreamMaybe(method)});");
+                }
         });
     }
 

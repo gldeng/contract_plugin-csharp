@@ -38,10 +38,16 @@ protoc -I ./protos_test/aelf/ -I ./protos_test/ --plugin=contract_csharp_plugin 
 ## Testing in AElf project
 
 1. Complete `Build` step and run the following command to copy plugin to AElf project.
-
 ``
 cp <UserRoot>/contract_plugin-csharp/src/ContractPlugin/bin/Release/net7.0/osx.13-arm64/publish/ContractPlugin <UserRoot>/AElf/scripts/contract_csharp_plugin
 ``
 
 2. Go to system contract module of AElf project, and run build command.
 
+## Remarks
+
+1. Since we change method type from "virtual" to "abstract", and some methods were not implemented in some system contracts. It will probably build failed. Therefore I add a new flag so that we can generate abstract or virtual methods base on flag.
+The usage is as followed.
+``
+protoc --contract_opt=virtual_method
+``
