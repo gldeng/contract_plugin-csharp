@@ -67,9 +67,6 @@ public static class ParameterParser
                 case "internal_access":
                     options.InternalAccess = true;
                     break;
-                case "virtual_method":
-                    options.VirtualMethod = true;
-                    break;
                 case "":
                     break;
                 default:

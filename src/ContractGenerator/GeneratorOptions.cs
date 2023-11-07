@@ -7,7 +7,6 @@ public class GeneratorOptions
     public bool GenerateReference { get; set; }
     public bool GenerateStub { get; set; }
     public bool GenerateEvent { get; set; }
-    public bool VirtualMethod { get; set; }
 
     public bool GenerateEventOnly => GenerateEvent & !GenerateContract & !GenerateReference & !GenerateStub;
     public bool GenerateContainer => GenerateContract | GenerateReference | GenerateStub;
